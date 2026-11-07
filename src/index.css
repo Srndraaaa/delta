@@ -1,0 +1,173 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 20% 3%;
+    --foreground: 210 40% 98%;
+
+    --card: 240 20% 5%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 240 20% 5%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 187 92% 52%;
+    --primary-foreground: 240 20% 3%;
+
+    --secondary: 260 84% 65%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 240 15% 12%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 187 92% 52%;
+    --accent-foreground: 240 20% 3%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 240 15% 15%;
+    --input: 240 15% 15%;
+    --ring: 187 92% 52%;
+
+    --radius: 0.85rem;
+  }
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  background-color: #040407;
+  color: #f1f5f9;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #06060c;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e2235;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #06b6d4;
+}
+
+/* Markdown typography inside reader */
+.prose-delta {
+  color: #cbd5e1;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  line-height: 1.8;
+}
+
+.prose-delta h1, .prose-delta h2, .prose-delta h3, .prose-delta h4 {
+  font-family: 'Space Grotesk', sans-serif;
+  color: #f8fafc;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.prose-delta h1 {
+  font-size: 1.875rem;
+  margin-top: 1.75rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.5rem;
+}
+
+.prose-delta h2 {
+  font-size: 1.35rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: #38bdf8;
+}
+
+.prose-delta h3 {
+  font-size: 1.15rem;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: #a5b4fc;
+}
+
+.prose-delta p {
+  margin-bottom: 1rem;
+}
+
+.prose-delta ul, .prose-delta ol {
+  margin-bottom: 1.25rem;
+  padding-left: 1.5rem;
+}
+
+.prose-delta ul {
+  list-style-type: disc;
+}
+
+.prose-delta ol {
+  list-style-type: decimal;
+}
+
+.prose-delta li {
+  margin-bottom: 0.4rem;
+}
+
+.prose-delta pre {
+  background: #080a14;
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: #e2e8f0;
+  margin: 1.25rem 0;
+}
+
+.prose-delta code:not(pre code) {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85em;
+  background: rgba(6, 182, 212, 0.12);
+  color: #67e8f9;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem;
+  border: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+.prose-delta blockquote {
+  border-left: 3px solid #06b6d4;
+  padding-left: 1rem;
+  margin: 1.25rem 0;
+  color: #94a3b8;
+  font-style: italic;
+  background: rgba(6, 182, 212, 0.05);
+  border-radius: 0 0.5rem 0.5rem 0;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.prose-delta table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.875rem;
+}
+
+.prose-delta th, .prose-delta td {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.prose-delta th {
+  background: rgba(255, 255, 255, 0.04);
+  font-family: 'Space Grotesk', sans-serif;
+  color: #f1f5f9;
+}

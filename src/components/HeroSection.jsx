@@ -1,4 +1,5 @@
 import React from 'react';
+import Galaxy from './reactbits/Galaxy';
 import TechText from './reactbits/TechText';
 import DitherVeil from './reactbits/DitherVeil';
 import { ArrowDown, Sparkles, Cpu, BookOpen, Orbit } from 'lucide-react';
@@ -8,6 +9,31 @@ import { Badge } from '@/components/ui/badge';
 export function HeroSection({ onExploreClick }) {
   return (
     <section className="relative min-h-[85vh] lg:min-h-[88vh] flex items-center justify-center overflow-hidden pt-6 pb-16 px-4 sm:px-6 lg:px-8">
+      
+      {/* ======================================================== */}
+      {/* 1.3 Background Antariksa Interaktif (Galaxy)             */}
+      {/* Sesuai DESIGN.md: background yang digunakan adalah        */}
+      {/* sebuah antariksa interaktif yang perintah-nya bisa        */}
+      {/* dilihat di @hero-background.md                            */}
+      {/* ======================================================== */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-auto">
+        <Galaxy
+          density={1.2}
+          glowIntensity={0.8}
+          flareIntensity={1.2}
+          starSpeed={0.5}
+          starSize={1.1}
+          mouseRepulsion={true}
+          clickWarp={true}
+          transparent={false}
+          backgroundColor="#040409"
+          starColors={['#06b6d4', '#38bdf8', '#818cf8', '#ffffff']}
+          className="w-full h-full"
+        />
+        {/* Soft bottom vignette to blend smoothly into subsequent sections */}
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-[#040407]" />
+      </div>
+
       <div className="max-w-7xl mx-auto w-full relative z-10">
         
         {/* 60% Left / 40% Right Layout (Grid 12 cols: 7 cols left = 58.3% ~ 60%, 5 cols right = 41.7% ~ 40%) */}

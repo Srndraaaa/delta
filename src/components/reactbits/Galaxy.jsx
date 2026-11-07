@@ -215,7 +215,13 @@ const start = (gl, palette, repel, warp) => {
   gl.shaderSource(vertex, VERTEX);
   gl.shaderSource(fragment, FRAGMENT.replace('\n', `\n${defines}`));
   gl.compileShader(vertex);
+  if (!gl.getShaderParameter(vertex, gl.COMPILE_STATUS)) {
+    console.warn('Galaxy vertex shader compile warning:', gl.getShaderInfoLog(vertex));
+  }
   gl.compileShader(fragment);
+  if (!gl.getShaderParameter(fragment, gl.COMPILE_STATUS)) {
+    console.warn('Galaxy fragment shader compile warning:', gl.getShaderInfoLog(fragment));
+  }
   gl.attachShader(program, vertex);
   gl.attachShader(program, fragment);
   gl.bindAttribLocation(program, 0, 'aPosition');
@@ -226,7 +232,10 @@ const start = (gl, palette, repel, warp) => {
 };
 
 const finish = (gl, program) => {
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return null;
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    console.warn('Galaxy program link warning:', gl.getProgramInfoLog(program));
+    return null;
+  }
   const uniforms = {};
   const count = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
   for (let i = 0; i < count; i++) {
@@ -235,6 +244,125 @@ const finish = (gl, program) => {
   }
   return { program, uniforms };
 };
+
+function runFallback2D(canvas, container, settingsRef) {
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return undefined;
+
+  let raf = 0;
+  let stars = [];
+  const count = 350;
+  let warpBoost = 0;
+  const mouse = { x: 0.5, y: 0.5, inside: false };
+  const palette = ['#06b6d4', '#38bdf8', '#818cf8', '#ffffff', '#a855f7'];
+
+  const initStars = (w, h) => {
+    stars = [];
+    for (let i = 0; i < count; i++) {
+      stars.push({
+        x: (Math.random() - 0.5) * w * 2.5,
+        y: (Math.random() - 0.5) * h * 2.5,
+        z: Math.random() * w,
+        size: Math.random() * 2 + 0.6,
+        color: palette[Math.floor(Math.random() * palette.length)],
+        twinkle: Math.random() * Math.PI * 2,
+      });
+    }
+  };
+
+  const resize = () => {
+    const w = container.clientWidth || window.innerWidth;
+    const h = container.clientHeight || window.innerHeight;
+    canvas.width = w;
+    canvas.height = h;
+    initStars(w, h);
+  };
+  resize();
+
+  const resizeObserver = new ResizeObserver(resize);
+  resizeObserver.observe(container);
+
+  const onPointerMove = (e) => {
+    const rect = container.getBoundingClientRect();
+    mouse.x = (e.clientX - rect.left) / Math.max(1, rect.width);
+    mouse.y = (e.clientY - rect.top) / Math.max(1, rect.height);
+    mouse.inside = mouse.x >= 0 && mouse.y >= 0 && mouse.x <= 1 && mouse.y <= 1;
+  };
+
+  const onPointerDown = () => {
+    warpBoost = 14;
+  };
+
+  window.addEventListener('pointermove', onPointerMove, { passive: true });
+  window.addEventListener('pointerdown', onPointerDown, { passive: true });
+
+  const render = () => {
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.fillStyle = '#05050b';
+    ctx.fillRect(0, 0, w, h);
+
+    const s = settingsRef.current || {};
+    const baseSpeed = (s.starSpeed || 0.5) * 6;
+    const speed = baseSpeed + warpBoost;
+    if (warpBoost > 0) warpBoost *= 0.95;
+
+    const cx = w * (0.5 + (mouse.x - 0.5) * 0.12);
+    const cy = h * (0.5 + (mouse.y - 0.5) * 0.12);
+
+    for (let i = 0; i < stars.length; i++) {
+      const star = stars[i];
+      star.z -= speed;
+      star.twinkle += 0.05;
+
+      if (star.z <= 0) {
+        star.z = w;
+        star.x = (Math.random() - 0.5) * w * 2.5;
+        star.y = (Math.random() - 0.5) * h * 2.5;
+      }
+
+      const k = 280 / star.z;
+      const px = star.x * k + cx;
+      const py = star.y * k + cy;
+
+      if (px >= 0 && px < w && py >= 0 && py < h) {
+        const depthAlpha = Math.min(1, (1 - star.z / w) * 1.6);
+        const twinkleFactor = 0.7 + 0.3 * Math.sin(star.twinkle);
+        const alpha = Math.max(0.1, depthAlpha * twinkleFactor);
+        const radius = Math.max(0.8, star.size * k * 0.6 * (warpBoost > 1 ? 1.4 : 1));
+
+        ctx.beginPath();
+        ctx.arc(px, py, radius, 0, Math.PI * 2);
+        ctx.fillStyle = star.color;
+        ctx.globalAlpha = alpha;
+        ctx.fill();
+
+        // Cross flares on larger foreground stars
+        if (radius > 2.2 && (s.flareIntensity || 1) > 0.5) {
+          ctx.strokeStyle = star.color;
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(px - radius * 2.5, py);
+          ctx.lineTo(px + radius * 2.5, py);
+          ctx.moveTo(px, py - radius * 2.5);
+          ctx.lineTo(px, py + radius * 2.5);
+          ctx.stroke();
+        }
+      }
+    }
+    ctx.globalAlpha = 1.0;
+    raf = requestAnimationFrame(render);
+  };
+
+  raf = requestAnimationFrame(render);
+
+  return () => {
+    cancelAnimationFrame(raf);
+    resizeObserver.disconnect();
+    window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerdown', onPointerDown);
+  };
+}
 
 const Galaxy = ({
   focal = [0.5, 0.5],
@@ -314,7 +442,10 @@ const Galaxy = ({
       depth: false,
       stencil: false
     });
-    if (!container || !canvas || !gl) return undefined;
+    if (!container || !canvas) return undefined;
+    if (!gl) {
+      return runFallback2D(canvas, container, settingsRef);
+    }
 
     const parallel = gl.getExtension('KHR_parallel_shader_compile');
     const programs = new Map();
@@ -339,7 +470,7 @@ const Galaxy = ({
     const initial = settingsRef.current;
     if (!variant(initial.palette.length > 0, false, false, true)) {
       programs.forEach(found => found.program && gl.deleteProgram(found.program));
-      return undefined;
+      return runFallback2D(canvas, container, settingsRef);
     }
 
     const buffer = gl.createBuffer();

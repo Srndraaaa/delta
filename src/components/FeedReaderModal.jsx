@@ -1,20 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Dialog, DialogClose } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, Clock, User, Share2, Check, Download, FileText } from 'lucide-react';
+import { Calendar, Clock, User, Share2, Download } from 'lucide-react';
 
 export function FeedReaderModal({ feed, open, onOpenChange }) {
-  const [copied, setCopied] = useState(false);
+  const [copyStatus, setCopyStatus] = useState('');
+
+  useEffect(() => { setCopyStatus(''); }, [open, feed?.slug]);
 
   if (!feed) return null;
 
-  const handleCopyLink = () => {
-    navigator.clipboard?.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopyLink = async () => {
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('feed', feed.slug);
+      await navigator.clipboard.writeText(url.toString());
+      setCopyStatus('Copied');
+    } catch {
+      setCopyStatus('Could not copy the link. Check clipboard permissions.');
+    }
   };
 
   const handleDownloadMd = () => {
@@ -28,9 +35,9 @@ export function FeedReaderModal({ feed, open, onOpenChange }) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange} labelledBy="feed-reader-title">
       {/* Modal Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-slate-900/80 backdrop-blur-md">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 sm:px-6 py-3 border-b border-white/10 bg-slate-900/80">
         <div className="flex items-center gap-3">
           <Badge variant="default" className="text-xs">
             {feed.category || 'Research'}
@@ -46,7 +53,7 @@ export function FeedReaderModal({ feed, open, onOpenChange }) {
             size="sm"
             onClick={handleDownloadMd}
             title="Download original .md file"
-            className="text-xs font-mono h-8 text-slate-300"
+            className="text-xs font-mono min-h-11 text-slate-300"
           >
             <Download className="w-3.5 h-3.5 mr-1.5 text-cyan-400" />
             .md
@@ -57,47 +64,32 @@ export function FeedReaderModal({ feed, open, onOpenChange }) {
             size="sm"
             onClick={handleCopyLink}
             title="Copy URL"
-            className="text-xs font-mono h-8 text-slate-300"
+            className="text-xs font-mono min-h-11 text-slate-300"
           >
-            {copied ? (
-              <>
-                <Check className="w-3.5 h-3.5 mr-1.5 text-emerald-400" />
-                Copied
-              </>
-            ) : (
-              <>
-                <Share2 className="w-3.5 h-3.5 mr-1.5 text-cyan-400" />
-                Share
-              </>
-            )}
+            <Share2 className="w-3.5 h-3.5 mr-1.5 text-cyan-400" />
+            Share
           </Button>
 
           <DialogClose onClick={() => onOpenChange(false)} />
         </div>
       </div>
 
+      {copyStatus && <p role="status" className="px-6 pt-2 text-sm text-slate-200">{copyStatus}</p>}
+
       {/* Modal Body / Scrollable Content */}
-      <div className="overflow-y-auto px-6 sm:px-10 py-8 max-h-[calc(90vh-140px)]">
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-10 py-8">
         {/* Paper Metadata Banner */}
         <div className="mb-8 border-b border-white/10 pb-6">
           <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-slate-400 mb-4">
-            <span className="flex items-center gap-1.5 text-cyan-400">
-              <User className="w-3.5 h-3.5" />
-              {feed.author}
-            </span>
-            <span>•</span>
-            <span className="flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5" />
-              {feed.date}
-            </span>
-            <span>•</span>
+            {feed.author && <span className="flex items-center gap-1.5 text-cyan-400"><User className="w-3.5 h-3.5" />{feed.author}</span>}
+            {feed.date && <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" />{feed.date}</span>}
             <span className="flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5" />
               {feed.readingTime}
             </span>
           </div>
 
-          <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight leading-snug">
+          <h1 id="feed-reader-title" className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight leading-snug">
             {feed.title}
           </h1>
 
@@ -124,13 +116,13 @@ export function FeedReaderModal({ feed, open, onOpenChange }) {
       </div>
 
       {/* Modal Footer */}
-      <div className="flex items-center justify-between px-6 py-3 border-t border-white/10 bg-slate-900/60 text-xs font-mono text-slate-400">
-        <span>Delta Research Node • 2026</span>
+      <div className="flex items-center justify-between gap-2 px-4 sm:px-6 py-3 border-t border-white/10 bg-slate-900/60 text-xs font-mono text-slate-400">
+        <span>Delta Feed</span>
         <Button
           size="sm"
           variant="outline"
           onClick={() => onOpenChange(false)}
-          className="text-xs h-8"
+          className="text-xs min-h-11"
         >
           Close Dispatch
         </Button>

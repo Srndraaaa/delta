@@ -88,6 +88,12 @@
     color 0.35s ease;
 }
 
+a.logoloop__content {
+  min-width: 44px;
+  min-height: 44px;
+  justify-content: center;
+}
+
 .logoloop[data-labels='below'] .logoloop__content {
   flex-direction: column;
   gap: calc(var(--logoloop-logoHeight) * 0.22);

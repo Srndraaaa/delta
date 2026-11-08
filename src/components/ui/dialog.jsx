@@ -2,40 +2,34 @@ import * as React from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-function Dialog({ open, onOpenChange, children }) {
-  React.useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape" && open) {
-        onOpenChange?.(false);
-      }
-    };
-    if (open) {
-      document.body.style.overflow = "hidden";
-      window.addEventListener("keydown", handleKeyDown);
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [open, onOpenChange]);
+function Dialog({ open, onOpenChange, children, labelledBy }) {
+  const ref = React.useRef(null);
 
-  if (!open) return null;
+  React.useEffect(() => {
+    if (!open) return undefined;
+    const dialog = ref.current;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    dialog.showModal();
+    return () => {
+      dialog.close();
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-10 animate-fade-in">
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity"
-        onClick={() => onOpenChange?.(false)}
-      />
-
-      {/* Modal Dialog Content */}
-      <div className="relative z-50 w-full max-w-4xl max-h-[90vh] flex flex-col bg-slate-950/95 border border-cyan-500/20 rounded-2xl shadow-[0_0_50px_rgba(6,182,212,0.15)] overflow-hidden">
-        {children}
-      </div>
-    </div>
+    <dialog
+      ref={ref}
+      aria-labelledby={labelledBy}
+      onCancel={(event) => { event.preventDefault(); onOpenChange?.(false); }}
+      onClick={(event) => {
+        const bounds = event.currentTarget.getBoundingClientRect();
+        if (event.target === event.currentTarget && (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom)) onOpenChange?.(false);
+      }}
+      className="hidden open:flex fixed inset-0 m-auto w-[calc(100%-2rem)] max-w-4xl max-h-[90vh] flex-col p-0 bg-slate-950 border border-cyan-500/20 rounded-2xl shadow-[0_0_50px_rgba(6,182,212,0.15)] overflow-hidden backdrop:bg-black/80"
+    >
+      {children}
+    </dialog>
   );
 }
 
@@ -44,7 +38,7 @@ function DialogClose({ onClick, className }) {
     <button
       onClick={onClick}
       className={cn(
-        "rounded-full p-2 text-slate-400 hover:text-white hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500",
+        "rounded-full min-w-11 min-h-11 p-2 text-slate-400 hover:text-white hover:bg-white/10 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300",
         className
       )}
       aria-label="Close"

@@ -1,4 +1,4 @@
-# Delta Feed — Research News for the Latest Agentics AI
+# Delta Feed: Research News for the Latest Agentic AI
 
 Delta Feed adalah platform web modern untuk kurasi riset kecerdasan buatan otonom (**Agentic AI**), dibangun menggunakan React, Vite, Tailwind CSS, dan komponen dari shadcn UI serta React Bits.
 
@@ -11,7 +11,7 @@ Dibangun berdasarkan spesifikasi dari **DESIGN.md** oleh **D.Rendra ~ 2026**.
 1. **Hero Section (60% Kiri / 40% Kanan)**:
    - **Bagian Kiri (60%)**:
      - **Judul**: `"Delta Feed"` menggunakan komponen interaktif `<TechText />` (React Bits) dengan animasi intro, efek outline pointer, dan drag.
-     - **Sub-Judul**: `"Reasearch news for the latest Agentics AI"` dengan tipografi modern bernuansa gradien kosmik.
+     - **Sub-Judul**: `"Research news for the latest Agentic AI"` dengan tipografi modern bernuansa gradien kosmik.
      - **Author Text**: `D.Rendra ~ 2026` (*italic*).
      - **Animasi Masuk**: Transisi halus berjenjang (*staggered fade-in*).
    - **Bagian Kanan (40%)**:
@@ -31,7 +31,7 @@ Dibangun berdasarkan spesifikasi dari **DESIGN.md** oleh **D.Rendra ~ 2026**.
    - Body & Text: **Plus Jakarta Sans**
    - Code & Meta: **JetBrains Mono**
 6. **Footer**:
-   - Branding Delta Feed, status protokol aktif, dan panduan deployment gratis.
+   - Branding dan informasi kurator Delta Feed.
 
 ---
 
@@ -119,4 +119,9 @@ npm run build
 
 # Preview hasil build
 npm run preview
+
+# Jalankan tes unit dan komponen
+npm test
 ```
+
+Untuk pemeriksaan interaksi di browser, jalankan `npm run dev`, lalu buka `http://localhost:5173/tests/browser.html`. Hasil setiap pemeriksaan ditampilkan sebagai PASS atau FAIL.

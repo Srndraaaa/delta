@@ -40,16 +40,15 @@ export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-white/5 pb-8">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="h-2 w-2 rounded-full bg-cyan-400"></span>
             <span className="text-xs font-mono uppercase tracking-widest text-cyan-400">
-              Live Research Repository
+              Research Library
             </span>
           </div>
           <h2 className="font-display text-3xl sm:text-4xl font-bold text-white tracking-tight">
             Agentic AI Research Feeds
           </h2>
           <p className="text-slate-400 text-sm mt-2 font-sans max-w-2xl">
-            Directly parsed from markdown dispatches located in the <code className="text-cyan-300 bg-cyan-950/50 px-1.5 py-0.5 rounded border border-cyan-500/30">feeds/</code> directory.
+            Browse research notes by topic, author, or keyword.
           </p>
         </div>
 
@@ -58,6 +57,7 @@ export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <Input
             type="text"
+            aria-label="Search research feeds"
             placeholder="Search papers, tags, topics..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -77,8 +77,10 @@ export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
           return (
             <button
               key={category}
+              type="button"
+              aria-pressed={isActive}
               onClick={() => setSelectedCategory(category)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all duration-200 border ${
+              className={`min-h-11 px-3 py-1.5 rounded-xl text-xs font-mono transition-all duration-200 border focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300 ${
                 isActive
                   ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.25)] font-semibold'
                   : 'bg-white/[0.02] text-slate-400 border-white/5 hover:bg-white/[0.05] hover:text-slate-200'
@@ -94,28 +96,33 @@ export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
       {filteredFeeds.length === 0 ? (
         <div className="py-20 text-center rounded-2xl border border-white/5 bg-slate-900/30">
           <BookOpen className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-          <h3 className="font-display text-lg text-slate-300 font-medium">No research feeds match your search</h3>
-          <p className="text-sm text-slate-500 mt-1">Try resetting the search keyword or filter.</p>
-          <Button
+          <h3 className="font-display text-lg text-slate-300 font-medium">{feeds.length ? 'No research feeds match your search' : 'No research feeds yet'}</h3>
+          <p className="text-sm text-slate-400 mt-1">{feeds.length ? 'Try resetting the search keyword or filter.' : 'Add a Markdown file to feeds/ and rebuild the site.'}</p>
+          {feeds.length > 0 && <Button
             variant="outline"
             size="sm"
             onClick={() => {
               setSearchQuery('');
               setSelectedCategory('All');
             }}
-            className="mt-4"
+            className="mt-4 min-h-11"
           >
             Clear Filters
-          </Button>
+          </Button>}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredFeeds.map((feed, index) => (
             <Card
               key={feed.slug || index}
-              onClick={() => onSelectFeed(feed)}
               className="cursor-pointer flex flex-col justify-between group"
             >
+              <button
+                type="button"
+                aria-label={`Read ${feed.title}`}
+                onClick={() => onSelectFeed(feed)}
+                className="absolute inset-0 z-10 w-full h-full rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-cyan-300"
+              />
               {/* Card Thumbnail Image */}
               <div className="relative w-full h-44 overflow-hidden bg-slate-950">
                 <img
@@ -171,8 +178,7 @@ export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
               {/* Card Footer */}
               <CardFooter className="pt-3 flex items-center justify-between border-t border-white/5">
                 <div className="flex items-center gap-2 text-slate-400">
-                  <User className="w-3.5 h-3.5 text-cyan-400" />
-                  <span className="text-xs truncate max-w-[140px]">{feed.author}</span>
+                  {feed.author && <><User className="w-3.5 h-3.5 text-cyan-400" /><span className="text-xs truncate max-w-[140px]">{feed.author}</span></>}
                 </div>
 
                 <div className="flex items-center gap-1 text-cyan-400 font-mono text-xs font-medium group-hover:translate-x-1 transition-transform">
@@ -187,8 +193,7 @@ export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
 
       {/* Grid Rows Indicator note */}
       <div className="mt-8 flex items-center justify-between text-xs font-mono text-slate-500 border-t border-white/5 pt-4">
-        <span>Showing {filteredFeeds.length} research publications (2-row grid architecture)</span>
-        <span className="text-cyan-400">feeds/*.md sync active</span>
+        <span>Showing {filteredFeeds.length} research publications</span>
       </div>
     </section>
   );

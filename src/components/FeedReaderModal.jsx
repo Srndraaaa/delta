@@ -18,7 +18,7 @@ export function FeedReaderModal({ feed, open, onOpenChange }) {
       const url = new URL(window.location.href);
       url.searchParams.set('feed', feed.slug);
       await navigator.clipboard.writeText(url.toString());
-      setCopyStatus('Copied');
+      setCopyStatus('Copied to clipboard');
     } catch {
       setCopyStatus('Could not copy the link. Check clipboard permissions.');
     }
@@ -36,13 +36,13 @@ export function FeedReaderModal({ feed, open, onOpenChange }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange} labelledBy="feed-reader-title">
-      {/* Modal Header */}
-      <div className="flex flex-wrap items-center justify-between gap-2 px-4 sm:px-6 py-3 border-b border-white/10 bg-slate-900/80">
+      {/* Modal Header (Light Theme) */}
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 sm:px-6 py-3 border-b border-slate-200/80 bg-slate-50/90">
         <div className="flex items-center gap-3">
-          <Badge variant="default" className="text-xs">
+          <span className="inline-flex items-center rounded-full border border-cyan-200 bg-cyan-50 px-2.5 py-0.5 text-xs font-sans font-semibold text-cyan-800">
             {feed.category || 'Research'}
-          </Badge>
-          <span className="text-xs font-sans text-slate-400 hidden sm:inline">
+          </span>
+          <span className="text-xs font-sans text-slate-500 hidden sm:inline">
             feeds/{feed.slug}.md
           </span>
         </div>
@@ -53,9 +53,9 @@ export function FeedReaderModal({ feed, open, onOpenChange }) {
             size="sm"
             onClick={handleDownloadMd}
             title="Download original .md file"
-            className="text-xs font-sans min-h-11 text-slate-300"
+            className="text-xs font-sans min-h-11 text-slate-700 hover:text-slate-900 hover:bg-slate-200/60"
           >
-            <Download className="w-3.5 h-3.5 mr-1.5 text-cyan-400" />
+            <Download className="w-3.5 h-3.5 mr-1.5 text-cyan-600" />
             .md
           </Button>
 
@@ -64,9 +64,9 @@ export function FeedReaderModal({ feed, open, onOpenChange }) {
             size="sm"
             onClick={handleCopyLink}
             title="Copy URL"
-            className="text-xs font-sans min-h-11 text-slate-300"
+            className="text-xs font-sans min-h-11 text-slate-700 hover:text-slate-900 hover:bg-slate-200/60"
           >
-            <Share2 className="w-3.5 h-3.5 mr-1.5 text-cyan-400" />
+            <Share2 className="w-3.5 h-3.5 mr-1.5 text-cyan-600" />
             Share
           </Button>
 
@@ -74,22 +74,38 @@ export function FeedReaderModal({ feed, open, onOpenChange }) {
         </div>
       </div>
 
-      {copyStatus && <p role="status" className="px-6 pt-2 text-sm text-slate-200">{copyStatus}</p>}
+      {copyStatus && (
+        <div className="px-6 pt-3">
+          <p role="status" className="text-xs font-sans text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg inline-block">
+            {copyStatus}
+          </p>
+        </div>
+      )}
 
-      {/* Modal Body / Scrollable Content */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-10 py-8">
+      {/* Modal Body / Scrollable Content (Light Theme) */}
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-10 py-8 bg-white">
         {/* Paper Metadata Banner */}
-        <div className="mb-8 border-b border-white/10 pb-6">
-          <div className="flex flex-wrap items-center gap-4 text-xs font-sans text-slate-400 mb-4">
-            {feed.author && <span className="flex items-center gap-1.5 text-cyan-400"><User className="w-3.5 h-3.5" />{feed.author}</span>}
-            {feed.date && <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" />{feed.date}</span>}
+        <div className="mb-8 border-b border-slate-200/80 pb-6">
+          <div className="flex flex-wrap items-center gap-4 text-xs font-sans text-slate-500 mb-4">
+            {feed.author && (
+              <span className="flex items-center gap-1.5 text-cyan-700 font-medium">
+                <User className="w-3.5 h-3.5 text-cyan-600" />
+                {feed.author}
+              </span>
+            )}
+            {feed.date && (
+              <span className="flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                {feed.date}
+              </span>
+            )}
             <span className="flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5" />
+              <Clock className="w-3.5 h-3.5 text-slate-400" />
               {feed.readingTime}
             </span>
           </div>
 
-          <h1 id="feed-reader-title" className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight leading-snug">
+          <h1 id="feed-reader-title" className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 tracking-tight leading-snug">
             {feed.title}
           </h1>
 
@@ -98,7 +114,7 @@ export function FeedReaderModal({ feed, open, onOpenChange }) {
               {feed.tags.map((tag, idx) => (
                 <span
                   key={idx}
-                  className="text-xs font-sans px-2.5 py-0.5 rounded-full bg-cyan-950/60 text-cyan-300 border border-cyan-500/20"
+                  className="text-xs font-sans px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200/80 font-medium"
                 >
                   #{tag}
                 </span>
@@ -108,21 +124,21 @@ export function FeedReaderModal({ feed, open, onOpenChange }) {
         </div>
 
         {/* Markdown Rendered Content */}
-        <div className="prose-delta max-w-none text-slate-200">
+        <div className="prose-delta max-w-none text-slate-700">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
             {feed.content}
           </ReactMarkdown>
         </div>
       </div>
 
-      {/* Modal Footer */}
-      <div className="flex items-center justify-between gap-2 px-4 sm:px-6 py-3 border-t border-white/10 bg-slate-900/60 text-xs font-sans text-slate-400">
-        <span>Delta Feed</span>
+      {/* Modal Footer (Light Theme) */}
+      <div className="flex items-center justify-between gap-2 px-4 sm:px-6 py-3 border-t border-slate-200/80 bg-slate-50/90 text-xs font-sans text-slate-600">
+        <span className="font-medium text-slate-700">Delta Feed</span>
         <Button
           size="sm"
           variant="outline"
           onClick={() => onOpenChange(false)}
-          className="text-xs min-h-11"
+          className="text-xs min-h-11 bg-white hover:bg-slate-100 text-slate-700 border-slate-300 shadow-xs"
         >
           Close Dispatch
         </Button>

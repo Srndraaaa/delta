@@ -47,6 +47,12 @@ test('article cards and search expose native accessible controls', () => {
   assert.match(html, /aria-pressed="true"/);
 });
 
+test('feed labels do not claim live sync or a fixed number of rows', () => {
+  const html = renderToStaticMarkup(React.createElement(FeedSection, { feeds: [feed], onSelectFeed() {} }));
+  assert.match(html, /Showing 1 research publications/);
+  assert.doesNotMatch(html, /Live Research Repository|sync active|2-row Cutout Card grid/);
+});
+
 test('reader uses a named native dialog', () => {
   const html = renderToStaticMarkup(React.createElement(FeedReaderModal, { feed, open: true, onOpenChange() {} }));
   assert.match(html, /<dialog[^>]*aria-labelledby="feed-reader-title"/);

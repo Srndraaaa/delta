@@ -130,7 +130,7 @@ function FeedCardItem({ feed, onSelectFeed }) {
             e.stopPropagation();
             onSelectFeed(feed);
           }}
-          className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full px-4 py-1.5 text-xs font-mono font-semibold shadow-lg shadow-cyan-500/25 transition-transform duration-150 active:scale-95 hover:brightness-110 flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer"
+          className="bg-blue-700 text-white rounded-full px-4 py-1.5 text-xs font-mono font-semibold shadow-lg shadow-cyan-500/25 transition-transform duration-150 active:scale-95 hover:brightness-110 flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer"
           type="button"
           aria-label={`Read ${feed.title}`}
         >
@@ -179,7 +179,7 @@ export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
           <div className="flex items-center gap-2 mb-2">
             <span className="h-2 w-2 rounded-full bg-cyan-400"></span>
             <span className="text-xs font-mono uppercase tracking-widest text-cyan-400">
-              Live Research Repository
+              Research Repository
             </span>
           </div>
           <h2 className="font-display text-3xl sm:text-4xl font-bold text-white tracking-tight">
@@ -274,8 +274,7 @@ export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
 
       {/* Grid Rows Indicator note */}
       <div className="mt-8 flex items-center justify-between text-xs font-mono text-slate-500 border-t border-white/5 pt-4">
-        <span>Showing {filteredFeeds.length} research publications (2-row Cutout Card grid)</span>
-        <span className="text-cyan-400">feeds/*.md sync active</span>
+        <span>Showing {filteredFeeds.length} research publications</span>
       </div>
     </section>
   );

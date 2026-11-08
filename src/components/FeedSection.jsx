@@ -6,7 +6,6 @@ import {
   CutoutCardContent,
   CutoutCardFooter,
   CutoutCardImage,
-  CutoutCardInsetLabel,
   CutoutCardMedia,
   CutoutCardOverlay,
   CutoutCardPin,
@@ -40,16 +39,6 @@ function FeedCardItem({ feed, onSelectFeed }) {
           src={feed.image}
         />
         <CutoutCardOverlay />
-
-        {/* Inset Label at bottom-left: Category with cutout corners */}
-        <CutoutCardInsetLabel className="bg-[#0b0c16] bottom-0 left-0 rounded-tr-[20px] px-4 py-2 flex items-center gap-1.5 z-10 border-t border-r border-white/5">
-          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-          <span className="text-cyan-300 text-[11px] font-mono font-semibold tracking-wider uppercase">
-            {feed.category}
-          </span>
-          <CutoutCorner className="text-[#0b0c16] absolute -right-[31px] -bottom-px rotate-90" />
-          <CutoutCorner className="text-[#0b0c16] absolute -top-[31px] -left-px rotate-90" />
-        </CutoutCardInsetLabel>
 
         {/* Pin badge at top-right with cutout corners */}
         {feed.badge && (
@@ -104,16 +93,7 @@ function FeedCardItem({ feed, onSelectFeed }) {
               ))}
             </div>
 
-            {/* Footer with Author and Reading Time */}
-            <CutoutCardFooter className="border-white/10 border-t pt-4">
-              <div className="flex items-center gap-2.5">
-                <div className="h-7 w-7 rounded-full bg-gradient-to-br from-cyan-500/30 to-blue-600/30 border border-cyan-500/40 flex items-center justify-center text-[11px] font-mono font-semibold text-cyan-300">
-                  {feed.author.charAt(0)}
-                </div>
-                <span className="text-slate-300 text-xs font-medium truncate max-w-[120px]">
-                  {feed.author}
-                </span>
-              </div>
+            <CutoutCardFooter className="border-white/10 border-t pt-4 justify-end">
               <span className="text-slate-400 text-xs font-mono tabular-nums flex items-center gap-1">
                 <Clock className="w-3 h-3 text-cyan-400" />
                 {feed.readingTime}

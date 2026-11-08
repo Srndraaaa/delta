@@ -25,7 +25,7 @@ background yang akan digunakan adalah sebuah antariksa interaktif yang perintah-
 ini adalah section untuk menampilkan logo-logo yang berjalan secara horizontal kamu bisa lihat perintahnya di @logo-loop.md
 
 #3. Feed Section
-ini adalah sebuah section yang berisi card-card dari feed yang ada. nantinya akan ada 2 baris card.
+ini adalah sebuah section yang berisi card-card dari feed yang ada. nantinya akan ada 2 baris card. untuk desain card bisa diakses didalam file @feed-card.md
 
 #4. Footer
 kamu design yang sesuai.

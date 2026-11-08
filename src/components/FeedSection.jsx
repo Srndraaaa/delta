@@ -1,9 +1,146 @@
 import React, { useState, useMemo } from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { motion } from 'motion/react';
+import {
+  CutoutCard,
+  CutoutCardAction,
+  CutoutCardContent,
+  CutoutCardFooter,
+  CutoutCardImage,
+  CutoutCardInsetLabel,
+  CutoutCardMedia,
+  CutoutCardOverlay,
+  CutoutCardPin,
+  CutoutCorner,
+  cutoutCardSurfaceClassName,
+  useCutoutContentStaggerVariants,
+} from '@/components/ui/cutout-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Clock, Calendar, User, ArrowUpRight, Filter, BookOpen } from 'lucide-react';
+import { Search, Clock, ArrowUpRight, Filter, BookOpen, Sparkles } from 'lucide-react';
+
+function FeedCardItem({ feed, onSelectFeed }) {
+  const stagger = useCutoutContentStaggerVariants();
+
+  return (
+    <CutoutCard
+      className={cutoutCardSurfaceClassName}
+      onClick={() => onSelectFeed(feed)}
+    >
+      <button
+        type="button"
+        aria-label={`Read ${feed.title}`}
+        onClick={() => onSelectFeed(feed)}
+        className="absolute inset-0 z-10 w-full h-full rounded-[28px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-cyan-300"
+      />
+
+      {/* Media section with image and cutout corners */}
+      <CutoutCardMedia className="h-60 sm:h-64">
+        <CutoutCardImage
+          alt={feed.title}
+          src={feed.image}
+        />
+        <CutoutCardOverlay />
+
+        {/* Inset Label at bottom-left: Category with cutout corners */}
+        <CutoutCardInsetLabel className="bg-[#0b0c16] bottom-0 left-0 rounded-tr-[20px] px-4 py-2 flex items-center gap-1.5 z-10 border-t border-r border-white/5">
+          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+          <span className="text-cyan-300 text-[11px] font-mono font-semibold tracking-wider uppercase">
+            {feed.category}
+          </span>
+          <CutoutCorner className="text-[#0b0c16] absolute -right-[31px] -bottom-px rotate-90" />
+          <CutoutCorner className="text-[#0b0c16] absolute -top-[31px] -left-px rotate-90" />
+        </CutoutCardInsetLabel>
+
+        {/* Pin badge at top-right with cutout corners */}
+        {feed.badge && (
+          <CutoutCardPin className="bg-cyan-500 text-slate-950 top-0 right-0 rounded-bl-[16px] px-3.5 py-1 text-xs font-mono font-bold shadow-lg shadow-cyan-500/20 z-10">
+            {feed.badge}
+            <CutoutCorner
+              className="text-cyan-500 absolute top-0 -left-[23px] -rotate-90"
+              size={24}
+            />
+            <CutoutCorner
+              className="text-cyan-500 absolute right-0 -bottom-[23px] -rotate-90"
+              size={24}
+            />
+          </CutoutCardPin>
+        )}
+      </CutoutCardMedia>
+
+      {/* Card Content with motion stagger animation */}
+      <CutoutCardContent className="flex-1 flex flex-col justify-between p-6">
+        <motion.div
+          animate="show"
+          className="contents"
+          initial="hidden"
+          variants={stagger.container}
+        >
+          <div>
+            <motion.h2
+              className="text-white mb-2 text-xl font-display leading-snug font-semibold group-hover/cutout:text-cyan-300 transition-colors line-clamp-2"
+              variants={stagger.item}
+            >
+              {feed.title}
+            </motion.h2>
+
+            <motion.p
+              className="text-slate-400 mb-4 text-xs font-sans leading-relaxed line-clamp-3"
+              variants={stagger.item}
+            >
+              {feed.summary}
+            </motion.p>
+          </div>
+
+          <motion.div variants={stagger.item} className="space-y-4">
+            {/* Tags */}
+            <div className="flex flex-wrap gap-1.5">
+              {feed.tags.slice(0, 3).map((tag, tIdx) => (
+                <span
+                  key={tIdx}
+                  className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/[0.04] text-slate-400 border border-white/5"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+
+            {/* Footer with Author and Reading Time */}
+            <CutoutCardFooter className="border-white/10 border-t pt-4">
+              <div className="flex items-center gap-2.5">
+                <div className="h-7 w-7 rounded-full bg-gradient-to-br from-cyan-500/30 to-blue-600/30 border border-cyan-500/40 flex items-center justify-center text-[11px] font-mono font-semibold text-cyan-300">
+                  {feed.author.charAt(0)}
+                </div>
+                <span className="text-slate-300 text-xs font-medium truncate max-w-[120px]">
+                  {feed.author}
+                </span>
+              </div>
+              <span className="text-slate-400 text-xs font-mono tabular-nums flex items-center gap-1">
+                <Clock className="w-3 h-3 text-cyan-400" />
+                {feed.readingTime}
+              </span>
+            </CutoutCardFooter>
+          </motion.div>
+        </motion.div>
+      </CutoutCardContent>
+
+      {/* Action button revealed on hover */}
+      <CutoutCardAction className="right-5 bottom-4 z-20">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelectFeed(feed);
+          }}
+          className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full px-4 py-1.5 text-xs font-mono font-semibold shadow-lg shadow-cyan-500/25 transition-transform duration-150 active:scale-95 hover:brightness-110 flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer"
+          type="button"
+          aria-label={`Read ${feed.title}`}
+        >
+          <span>Read Paper</span>
+          <ArrowUpRight className="w-3.5 h-3.5" />
+        </button>
+      </CutoutCardAction>
+    </CutoutCard>
+  );
+}
 
 export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -40,15 +177,20 @@ export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-white/5 pb-8">
         <div>
           <div className="flex items-center gap-2 mb-2">
+            <span className="h-2 w-2 rounded-full bg-cyan-400"></span>
             <span className="text-xs font-mono uppercase tracking-widest text-cyan-400">
-              Research Library
+              Live Research Repository
             </span>
           </div>
           <h2 className="font-display text-3xl sm:text-4xl font-bold text-white tracking-tight">
             Agentic AI Research Feeds
           </h2>
           <p className="text-slate-400 text-sm mt-2 font-sans max-w-2xl">
-            Browse research notes by topic, author, or keyword.
+            Directly parsed from markdown dispatches located in the{' '}
+            <code className="text-cyan-300 bg-cyan-950/50 px-1.5 py-0.5 rounded border border-cyan-500/30">
+              feeds/
+            </code>{' '}
+            directory, presented in Cutout Card format.
           </p>
         </div>
 
@@ -96,104 +238,44 @@ export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
       {filteredFeeds.length === 0 ? (
         <div className="py-20 text-center rounded-2xl border border-white/5 bg-slate-900/30">
           <BookOpen className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-          <h3 className="font-display text-lg text-slate-300 font-medium">{feeds.length ? 'No research feeds match your search' : 'No research feeds yet'}</h3>
-          <p className="text-sm text-slate-400 mt-1">{feeds.length ? 'Try resetting the search keyword or filter.' : 'Add a Markdown file to feeds/ and rebuild the site.'}</p>
-          {feeds.length > 0 && <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              setSearchQuery('');
-              setSelectedCategory('All');
-            }}
-            className="mt-4 min-h-11"
-          >
-            Clear Filters
-          </Button>}
+          <h3 className="font-display text-lg text-slate-300 font-medium">
+            {feeds.length ? 'No research feeds match your search' : 'No research feeds yet'}
+          </h3>
+          <p className="text-sm text-slate-400 mt-1">
+            {feeds.length
+              ? 'Try resetting the search keyword or filter.'
+              : 'Add a Markdown file to feeds/ and rebuild the site.'}
+          </p>
+          {feeds.length > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSearchQuery('');
+                setSelectedCategory('All');
+              }}
+              className="mt-4 min-h-11"
+            >
+              Clear Filters
+            </Button>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredFeeds.map((feed, index) => (
-            <Card
+            <FeedCardItem
               key={feed.slug || index}
-              className="cursor-pointer flex flex-col justify-between group"
-            >
-              <button
-                type="button"
-                aria-label={`Read ${feed.title}`}
-                onClick={() => onSelectFeed(feed)}
-                className="absolute inset-0 z-10 w-full h-full rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-cyan-300"
-              />
-              {/* Card Thumbnail Image */}
-              <div className="relative w-full h-44 overflow-hidden bg-slate-950">
-                <img
-                  src={feed.image}
-                  alt={feed.title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
-                
-                {/* Badges on top of image */}
-                <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-                  <Badge variant="default" className="text-[11px] bg-slate-950/80 backdrop-blur-md">
-                    {feed.category}
-                  </Badge>
-                  {feed.badge && (
-                    <Badge variant="emerald" className="text-[11px] bg-slate-950/80 backdrop-blur-md">
-                      {feed.badge}
-                    </Badge>
-                  )}
-                </div>
-
-                <div className="absolute bottom-2.5 left-3 flex items-center gap-2 text-[11px] font-mono text-slate-300">
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-cyan-400" />
-                    {feed.readingTime}
-                  </span>
-                </div>
-              </div>
-
-              {/* Card Body */}
-              <CardHeader className="flex-1 pb-3">
-                <CardTitle className="text-lg line-clamp-2 leading-snug group-hover:text-cyan-300 transition-colors">
-                  {feed.title}
-                </CardTitle>
-                <CardDescription className="line-clamp-3 text-xs text-slate-400 mt-2">
-                  {feed.summary}
-                </CardDescription>
-              </CardHeader>
-
-              {/* Tags */}
-              <div className="px-6 pb-4 flex flex-wrap gap-1.5">
-                {feed.tags.slice(0, 3).map((tag, tIdx) => (
-                  <span
-                    key={tIdx}
-                    className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/[0.04] text-slate-400 border border-white/5"
-                  >
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-
-              {/* Card Footer */}
-              <CardFooter className="pt-3 flex items-center justify-between border-t border-white/5">
-                <div className="flex items-center gap-2 text-slate-400">
-                  {feed.author && <><User className="w-3.5 h-3.5 text-cyan-400" /><span className="text-xs truncate max-w-[140px]">{feed.author}</span></>}
-                </div>
-
-                <div className="flex items-center gap-1 text-cyan-400 font-mono text-xs font-medium group-hover:translate-x-1 transition-transform">
-                  <span>Read Paper</span>
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                </div>
-              </CardFooter>
-            </Card>
+              feed={feed}
+              onSelectFeed={onSelectFeed}
+            />
           ))}
         </div>
       )}
 
       {/* Grid Rows Indicator note */}
       <div className="mt-8 flex items-center justify-between text-xs font-mono text-slate-500 border-t border-white/5 pt-4">
-        <span>Showing {filteredFeeds.length} research publications</span>
+        <span>Showing {filteredFeeds.length} research publications (2-row Cutout Card grid)</span>
+        <span className="text-cyan-400">feeds/*.md sync active</span>
       </div>
     </section>
   );

@@ -48,11 +48,29 @@ export default function App() {
           {/* Section 2: Logo loop section */}
           <LogoLoopSection />
 
-          {/* Section 3: Feed Section (2-row grid of markdown cards) */}
+          {/* Soft black to white gradient transition */}
+          <div
+            aria-hidden="true"
+            className="w-full h-36 sm:h-52 lg:h-72 pointer-events-none -mb-px"
+            style={{
+              background: 'linear-gradient(to bottom, #040407 0%, #070b16 12%, #0f172a 25%, #1e293b 40%, #334155 54%, #64748b 67%, #94a3b8 78%, #cbd5e1 87%, #e2e8f0 94%, #f8fafc 100%)',
+            }}
+          />
+
+          {/* Section 3: Feed Section (Light Theme) */}
           <FeedSection
             feeds={feeds}
             onSelectFeed={handleSelectFeed}
             feedSectionRef={feedSectionRef}
+          />
+
+          {/* Soft white to black gradient transition to footer */}
+          <div
+            aria-hidden="true"
+            className="w-full h-28 sm:h-40 pointer-events-none -mt-px"
+            style={{
+              background: 'linear-gradient(to bottom, #f8fafc 0%, #e2e8f0 15%, #cbd5e1 32%, #94a3b8 50%, #475569 68%, #1e293b 82%, #0f172a 92%, #030306 100%)',
+            }}
           />
         </main>
 

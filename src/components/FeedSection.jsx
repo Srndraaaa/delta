@@ -156,7 +156,7 @@ export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
     <section
       ref={feedSectionRef}
       id="feeds"
-      className="relative bg-slate-50 text-slate-900 py-20 px-4 sm:px-6 lg:px-8 transition-colors"
+      className="relative bg-slate-50 text-slate-900 py-20 px-4 sm:px-6 lg:px-8 transition-colors snap-start scroll-mt-16"
     >
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}

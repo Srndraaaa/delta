@@ -2,12 +2,16 @@ import React from 'react';
 import Galaxy from './reactbits/Galaxy';
 import TechText from './reactbits/TechText';
 import DitherVeil from './reactbits/DitherVeil';
+import { LogoLoopSection } from './LogoLoopSection';
 import { BookOpen } from '@keyline-icons/react';
 import { Button } from '@/components/ui/button';
 
 export function HeroSection({ onExploreClick }) {
   return (
-    <section className="relative min-h-[85vh] lg:min-h-[88vh] flex items-center justify-center overflow-hidden pt-6 pb-16 px-4 sm:px-6 lg:px-8">
+    <section
+      id="hero"
+      className="relative min-h-[calc(100vh-4rem)] flex flex-col justify-between overflow-hidden pt-4 pb-0 snap-start scroll-mt-16"
+    >
       
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-auto">
         <Galaxy
@@ -27,9 +31,10 @@ export function HeroSection({ onExploreClick }) {
         <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-[#040407]" />
       </div>
 
-      <div className="max-w-7xl mx-auto w-full relative z-10">
+      {/* Main Hero Content (60% Left, 40% Right) */}
+      <div className="max-w-7xl mx-auto w-full relative z-10 px-4 sm:px-6 lg:px-8 flex-1 flex items-center py-6 sm:py-10">
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center w-full">
           <div className="lg:col-span-7 flex flex-col justify-center space-y-6 text-left">
 
             {/* 1. HIRARKI 1: Judul "Delta Feed" menggunakan component TechText */}
@@ -110,6 +115,11 @@ export function HeroSection({ onExploreClick }) {
           </div>
 
         </div>
+      </div>
+
+      {/* 2. Logo Loop Section: ditempatkan di bagian bawah Hero Section agar dapat dilihat normal */}
+      <div className="relative z-10 w-full mt-auto">
+        <LogoLoopSection />
       </div>
     </section>
   );

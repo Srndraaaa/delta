@@ -83,22 +83,22 @@ const agenticLogos = [
   },
 ];
 
-export function LogoLoopSection() {
+export function LogoLoopSection({ className = '' }) {
   return (
-    <section className="relative py-12 border-y border-white/5 bg-[#050508]/60 backdrop-blur-md overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6 text-center">
-        <p className="text-xs font-sans uppercase tracking-[0.25em] text-slate-400">
+    <div className={`relative py-6 sm:py-8 border-t border-white/5 bg-[#050508]/40 backdrop-blur-sm overflow-hidden ${className}`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4 text-center">
+        <p className="text-[11px] sm:text-xs font-sans uppercase tracking-[0.25em] text-slate-400 font-medium">
           Tracking Advancements Across Frontier Ecosystems & Protocols
         </p>
       </div>
 
-      <div className="relative w-full h-16 flex items-center">
+      <div className="relative w-full h-14 flex items-center">
         <LogoLoop
           logos={agenticLogos}
           speed={60}
           direction="left"
-          logoHeight={34}
-          gap={52}
+          logoHeight={32}
+          gap={48}
           hoverSpeed={0}
           scaleOnHover={true}
           labels="hover"
@@ -106,6 +106,6 @@ export function LogoLoopSection() {
           className="w-full"
         />
       </div>
-    </section>
+    </div>
   );
 }

@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/cutout-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Clock, ArrowUpRight, Filter, BookOpen, Sparkles } from 'lucide-react';
+import { Search, Clock, ArrowUpRight, Filter, BookOpen, Sparkles } from '@keyline-icons/react';
 
 function FeedCardItem({ feed, onSelectFeed }) {
   const stagger = useCutoutContentStaggerVariants();
@@ -42,7 +42,7 @@ function FeedCardItem({ feed, onSelectFeed }) {
 
         {/* Pin badge at top-right with cutout corners */}
         {feed.badge && (
-          <CutoutCardPin className="bg-cyan-500 text-slate-950 top-0 right-0 rounded-bl-[16px] px-3.5 py-1 text-xs font-mono font-bold shadow-lg shadow-cyan-500/20 z-10">
+          <CutoutCardPin className="bg-cyan-500 text-slate-950 top-0 right-0 rounded-bl-[16px] px-3.5 py-1 text-xs font-sans font-bold shadow-lg shadow-cyan-500/20 z-10">
             {feed.badge}
             <CutoutCorner
               className="text-cyan-500 absolute top-0 -left-[23px] -rotate-90"
@@ -86,7 +86,7 @@ function FeedCardItem({ feed, onSelectFeed }) {
               {feed.tags.slice(0, 3).map((tag, tIdx) => (
                 <span
                   key={tIdx}
-                  className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/[0.04] text-slate-400 border border-white/5"
+                  className="text-[10px] font-sans px-2 py-0.5 rounded bg-white/[0.04] text-slate-400 border border-white/5"
                 >
                   #{tag}
                 </span>
@@ -94,7 +94,7 @@ function FeedCardItem({ feed, onSelectFeed }) {
             </div>
 
             <CutoutCardFooter className="border-white/10 border-t pt-4 justify-end">
-              <span className="text-slate-400 text-xs font-mono tabular-nums flex items-center gap-1">
+              <span className="text-slate-400 text-xs font-sans tabular-nums flex items-center gap-1">
                 <Clock className="w-3 h-3 text-cyan-400" />
                 {feed.readingTime}
               </span>
@@ -110,7 +110,7 @@ function FeedCardItem({ feed, onSelectFeed }) {
             e.stopPropagation();
             onSelectFeed(feed);
           }}
-          className="bg-blue-700 text-white rounded-full px-4 py-1.5 text-xs font-mono font-semibold shadow-lg shadow-cyan-500/25 transition-transform duration-150 active:scale-95 hover:brightness-110 flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer"
+          className="bg-blue-700 text-white rounded-full px-4 py-1.5 text-xs font-sans font-semibold shadow-lg shadow-cyan-500/25 transition-transform duration-150 active:scale-95 hover:brightness-110 flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer"
           type="button"
           aria-label={`Read ${feed.title}`}
         >
@@ -158,7 +158,7 @@ export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="h-2 w-2 rounded-full bg-cyan-400"></span>
-            <span className="text-xs font-mono uppercase tracking-widest text-cyan-400">
+            <span className="text-xs font-sans uppercase tracking-widest text-cyan-400">
               Research Repository
             </span>
           </div>
@@ -190,7 +190,7 @@ export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
 
       {/* Category Pills Filter */}
       <div className="flex flex-wrap items-center gap-2 mb-10">
-        <span className="text-xs font-mono text-slate-400 flex items-center gap-1.5 mr-2">
+        <span className="text-xs font-sans text-slate-400 flex items-center gap-1.5 mr-2">
           <Filter className="w-3.5 h-3.5 text-cyan-400" />
           Filter:
         </span>
@@ -202,7 +202,7 @@ export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
               type="button"
               aria-pressed={isActive}
               onClick={() => setSelectedCategory(category)}
-              className={`min-h-11 px-3 py-1.5 rounded-xl text-xs font-mono transition-all duration-200 border focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300 ${
+              className={`min-h-11 px-3 py-1.5 rounded-xl text-xs font-sans transition-all duration-200 border focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300 ${
                 isActive
                   ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.25)] font-semibold'
                   : 'bg-white/[0.02] text-slate-400 border-white/5 hover:bg-white/[0.05] hover:text-slate-200'
@@ -253,7 +253,7 @@ export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
       )}
 
       {/* Grid Rows Indicator note */}
-      <div className="mt-8 flex items-center justify-between text-xs font-mono text-slate-500 border-t border-white/5 pt-4">
+      <div className="mt-8 flex items-center justify-between text-xs font-sans text-slate-500 border-t border-white/5 pt-4">
         <span>Showing {filteredFeeds.length} research publications</span>
       </div>
     </section>

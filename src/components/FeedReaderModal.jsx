@@ -4,7 +4,7 @@ import remarkGfm from 'remark-gfm';
 import { Dialog, DialogClose } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, Clock, User, Share2, Download } from 'lucide-react';
+import { Calendar, Clock, User, Share2, Download } from '@keyline-icons/react';
 
 export function FeedReaderModal({ feed, open, onOpenChange }) {
   const [copyStatus, setCopyStatus] = useState('');
@@ -42,7 +42,7 @@ export function FeedReaderModal({ feed, open, onOpenChange }) {
           <Badge variant="default" className="text-xs">
             {feed.category || 'Research'}
           </Badge>
-          <span className="text-xs font-mono text-slate-400 hidden sm:inline">
+          <span className="text-xs font-sans text-slate-400 hidden sm:inline">
             feeds/{feed.slug}.md
           </span>
         </div>
@@ -53,7 +53,7 @@ export function FeedReaderModal({ feed, open, onOpenChange }) {
             size="sm"
             onClick={handleDownloadMd}
             title="Download original .md file"
-            className="text-xs font-mono min-h-11 text-slate-300"
+            className="text-xs font-sans min-h-11 text-slate-300"
           >
             <Download className="w-3.5 h-3.5 mr-1.5 text-cyan-400" />
             .md
@@ -64,7 +64,7 @@ export function FeedReaderModal({ feed, open, onOpenChange }) {
             size="sm"
             onClick={handleCopyLink}
             title="Copy URL"
-            className="text-xs font-mono min-h-11 text-slate-300"
+            className="text-xs font-sans min-h-11 text-slate-300"
           >
             <Share2 className="w-3.5 h-3.5 mr-1.5 text-cyan-400" />
             Share
@@ -80,7 +80,7 @@ export function FeedReaderModal({ feed, open, onOpenChange }) {
       <div className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-10 py-8">
         {/* Paper Metadata Banner */}
         <div className="mb-8 border-b border-white/10 pb-6">
-          <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-slate-400 mb-4">
+          <div className="flex flex-wrap items-center gap-4 text-xs font-sans text-slate-400 mb-4">
             {feed.author && <span className="flex items-center gap-1.5 text-cyan-400"><User className="w-3.5 h-3.5" />{feed.author}</span>}
             {feed.date && <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" />{feed.date}</span>}
             <span className="flex items-center gap-1.5">
@@ -98,7 +98,7 @@ export function FeedReaderModal({ feed, open, onOpenChange }) {
               {feed.tags.map((tag, idx) => (
                 <span
                   key={idx}
-                  className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-cyan-950/60 text-cyan-300 border border-cyan-500/20"
+                  className="text-xs font-sans px-2.5 py-0.5 rounded-full bg-cyan-950/60 text-cyan-300 border border-cyan-500/20"
                 >
                   #{tag}
                 </span>
@@ -116,7 +116,7 @@ export function FeedReaderModal({ feed, open, onOpenChange }) {
       </div>
 
       {/* Modal Footer */}
-      <div className="flex items-center justify-between gap-2 px-4 sm:px-6 py-3 border-t border-white/10 bg-slate-900/60 text-xs font-mono text-slate-400">
+      <div className="flex items-center justify-between gap-2 px-4 sm:px-6 py-3 border-t border-white/10 bg-slate-900/60 text-xs font-sans text-slate-400">
         <span>Delta Feed</span>
         <Button
           size="sm"

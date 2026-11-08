@@ -87,7 +87,7 @@ export function LogoLoopSection() {
   return (
     <section className="relative py-12 border-y border-white/5 bg-[#050508]/60 backdrop-blur-md overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6 text-center">
-        <p className="text-xs font-mono uppercase tracking-[0.25em] text-slate-400">
+        <p className="text-xs font-sans uppercase tracking-[0.25em] text-slate-400">
           Tracking Advancements Across Frontier Ecosystems & Protocols
         </p>
       </div>

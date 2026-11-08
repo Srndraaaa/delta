@@ -1,5 +1,5 @@
 import * as React from "react";
-import { X } from "lucide-react";
+import { X } from "@keyline-icons/react";
 import { cn } from "@/lib/utils";
 
 function Dialog({ open, onOpenChange, children, labelledBy }) {

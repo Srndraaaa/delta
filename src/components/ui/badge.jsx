@@ -13,7 +13,7 @@ function Badge({ className, variant = "default", ...props }) {
   return (
     <div
       className={cn(
-        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-mono font-medium transition-colors tracking-wide",
+        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-sans font-medium transition-colors tracking-wide",
         variants[variant] || variants.default,
         className
       )}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen } from 'lucide-react';
+import { BookOpen } from '@keyline-icons/react';
 import { Button } from '@/components/ui/button';
 
 export function Navbar({ onExploreClick }) {
@@ -16,7 +16,7 @@ export function Navbar({ onExploreClick }) {
             <div className="flex items-center gap-2">
               <span className="font-display font-bold text-lg text-white tracking-tight">Delta Feed</span>
             </div>
-            <p className="text-[11px] text-slate-400 hidden sm:block font-mono">Agentics AI Dispatch</p>
+            <p className="text-[11px] text-slate-400 hidden sm:block font-sans">Agentics AI Dispatch</p>
           </div>
         </div>
 
@@ -26,7 +26,7 @@ export function Navbar({ onExploreClick }) {
             variant="ghost"
             size="sm"
             onClick={onExploreClick}
-            className="min-h-11 text-xs font-mono text-slate-300 hover:text-cyan-300"
+            className="min-h-11 text-xs font-sans text-slate-300 hover:text-cyan-300"
           >
             <BookOpen className="w-3.5 h-3.5 mr-1.5 text-cyan-400" />
             Research Feed

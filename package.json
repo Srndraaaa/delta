@@ -10,8 +10,8 @@
     "test": "node --test"
   },
   "dependencies": {
+    "@keyline-icons/react": "^2.6.0",
     "clsx": "^2.1.1",
-    "lucide-react": "^0.469.0",
     "motion": "^14.10.1",
     "ogl": "^1.0.11",
     "react": "^18.3.1",

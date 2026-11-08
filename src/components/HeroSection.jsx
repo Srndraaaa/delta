@@ -2,7 +2,7 @@ import React from 'react';
 import Galaxy from './reactbits/Galaxy';
 import TechText from './reactbits/TechText';
 import DitherVeil from './reactbits/DitherVeil';
-import { BookOpen } from 'lucide-react';
+import { BookOpen } from '@keyline-icons/react';
 import { Button } from '@/components/ui/button';
 
 export function HeroSection({ onExploreClick }) {

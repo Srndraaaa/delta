@@ -39,14 +39,14 @@ function useControllableState({ prop, defaultProp, onChange }) {
 // ============================================================================
 
 export const cutoutCardSurfaceShadowClassName = cn(
-  "border border-white/10",
-  "shadow-[0_4px_24px_rgba(0,0,0,0.6)]",
+  "border border-slate-200/80",
+  "shadow-[0_4px_20px_rgba(0,0,0,0.06)]",
   "transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]",
-  "hover:border-cyan-500/40 hover:shadow-[0_0_35px_rgba(6,182,212,0.2)]"
+  "hover:border-slate-300 hover:shadow-[0_16px_36px_rgba(0,0,0,0.12)]"
 );
 
 export const cutoutCardSurfaceClassName = cn(
-  "group/cutout bg-[#0b0c16] text-slate-100 relative cursor-pointer overflow-hidden rounded-[28px] border border-white/10",
+  "group/cutout bg-white text-slate-900 relative cursor-pointer overflow-hidden rounded-[28px] border border-slate-200/80",
   cutoutCardSurfaceShadowClassName
 );
 

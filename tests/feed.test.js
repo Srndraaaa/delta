@@ -47,6 +47,24 @@ test('article cards and search expose native accessible controls', () => {
   assert.match(html, /aria-pressed="true"/);
 });
 
+test('category is available as a filter but not displayed on cards', () => {
+  const html = renderToStaticMarkup(React.createElement(FeedSection, { feeds: [feed], onSelectFeed() {} }));
+  assert.match(html, />Research<\/button>/);
+  assert.doesNotMatch(html, /data-slot="cutout-card-inset-label"/);
+});
+
+test('cards show reading time without the author', () => {
+  const html = renderToStaticMarkup(React.createElement(FeedSection, { feeds: [feed], onSelectFeed() {} }));
+  assert.match(html, /1 min read/);
+  assert.doesNotMatch(html, />Researcher</);
+});
+
+test('feed labels do not claim live sync or a fixed number of rows', () => {
+  const html = renderToStaticMarkup(React.createElement(FeedSection, { feeds: [feed], onSelectFeed() {} }));
+  assert.match(html, /Showing 1 research publications/);
+  assert.doesNotMatch(html, /Live Research Repository|sync active|2-row Cutout Card grid/);
+});
+
 test('reader uses a named native dialog', () => {
   const html = renderToStaticMarkup(React.createElement(FeedReaderModal, { feed, open: true, onOpenChange() {} }));
   assert.match(html, /<dialog[^>]*aria-labelledby="feed-reader-title"/);

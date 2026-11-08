@@ -8,16 +8,19 @@ import { Footer } from './components/Footer';
 import { loadFeeds } from './lib/feedLoader';
 
 export default function App() {
-  const [feeds, setFeeds] = useState([]);
+  const [feeds] = useState(loadFeeds);
   const [selectedFeed, setSelectedFeed] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const feedSectionRef = useRef(null);
 
   useEffect(() => {
-    // Load markdown feeds dynamically from feeds/ directory
-    const loaded = loadFeeds();
-    setFeeds(loaded);
-  }, []);
+    const slug = new URLSearchParams(window.location.search).get('feed');
+    const linkedFeed = feeds.find((feed) => feed.slug === slug);
+    if (linkedFeed) {
+      setSelectedFeed(linkedFeed);
+      setIsModalOpen(true);
+    }
+  }, [feeds]);
 
   const handleSelectFeed = (feed) => {
     setSelectedFeed(feed);
@@ -26,7 +29,8 @@ export default function App() {
 
   const scrollToFeeds = () => {
     if (feedSectionRef.current) {
-      feedSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+      const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      feedSectionRef.current.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth' });
     }
   };
 

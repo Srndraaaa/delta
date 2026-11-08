@@ -43,8 +43,8 @@ export function parseMarkdown(rawContent, fallbackFilename = '') {
   // Fallbacks if metadata is missing
   const slug = metadata.id || fallbackFilename.replace(/\.md$/, '').split('/').pop() || 'article';
   const title = metadata.title || slug.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-  const date = metadata.date || '2026-11-01';
-  const author = metadata.author || 'D.Rendra ~ Delta';
+  const date = metadata.date || '';
+  const author = metadata.author || '';
   const category = metadata.category || 'Agentic AI';
   const tags = Array.isArray(metadata.tags) ? metadata.tags : (metadata.tags ? [metadata.tags] : ['AI', 'Research']);
   const readingTime = metadata.readingTime || `${Math.max(2, Math.round(content.split(/\s+/).length / 180))} min read`;
@@ -87,5 +87,5 @@ export function loadFeeds() {
   }
 
   // Sort descending by date
-  return feeds.sort((a, b) => new Date(b.date) - new Date(a.date));
+  return feeds.sort((a, b) => (Date.parse(b.date) || 0) - (Date.parse(a.date) || 0));
 }

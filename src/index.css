@@ -171,3 +171,11 @@ body {
   font-family: 'Space Grotesk', sans-serif;
   color: #f1f5f9;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

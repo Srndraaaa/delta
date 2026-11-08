@@ -102,7 +102,7 @@ export function LogoLoopSection() {
           hoverSpeed={0}
           scaleOnHover={true}
           labels="hover"
-          ariaLabel="Agentic AI Technology Partners"
+          ariaLabel="Agentic AI technologies and organizations"
           className="w-full"
         />
       </div>

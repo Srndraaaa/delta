@@ -1,5 +1,6 @@
 ---
 id: "grounded-reflection-loops"
+readers: 0
 title: "Eliminating Hallucinatory Drifts in Long-Horizon Agent Loops Through Grounded Verification"
 date: "2026-11-01"
 author: "Delta Research Lab"

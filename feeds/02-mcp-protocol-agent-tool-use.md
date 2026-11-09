@@ -1,5 +1,6 @@
 ---
 id: "mcp-protocol-agent-tool-use"
+readers: 0
 title: "The Model Context Protocol (MCP) in Production: Standardizing Agentic Toolchains"
 date: "2026-11-05"
 author: "D.Rendra ~ Delta Research"

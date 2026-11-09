@@ -1,5 +1,6 @@
 ---
 id: "continuous-reinforcement-learning-agentic-traces"
+readers: 0
 title: "Online Direct Preference Optimization (DPO) from Production Agent Trajectories"
 date: "2026-10-18"
 author: "Dr. Nikolai Volkov"

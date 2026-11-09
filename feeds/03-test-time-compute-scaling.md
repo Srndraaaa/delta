@@ -1,5 +1,6 @@
 ---
 id: "test-time-compute-scaling"
+readers: 0
 title: "Test-Time Compute Scaling & Tree Search in Coding Agents: Benchmark Analysis"
 date: "2026-11-03"
 author: "Delta Research Lab"

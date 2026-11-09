@@ -1,5 +1,6 @@
 ---
 id: "graph-rag-temporal-knowledge-retrieval"
+readers: 0
 title: "Temporal GraphRAG: Real-Time Dynamic Knowledge Graphs for Long-Horizon Agents"
 date: "2026-11-03"
 author: "Sophia Rostova"

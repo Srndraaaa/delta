@@ -1,5 +1,6 @@
 ---
 id: "edge-slm-agentic-workloads"
+readers: 0
 title: "Deploying Small Language Models (SLMs) on Edge Devices for Local Tool Execution"
 date: "2026-10-26"
 author: "Mateo Silva"

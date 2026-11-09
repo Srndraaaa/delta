@@ -7,11 +7,87 @@ import { Footer } from './components/Footer';
 import { loadFeeds } from './lib/feedLoader';
 import { useMagneticScroll } from './hooks/useMagneticScroll';
 
+const READ_COUNTS_KEY = 'delta-feed-local-read-counts';
+const READ_COUNT_KEY_PREFIX = `${READ_COUNTS_KEY}:`;
+
+function readCountKey(slug) {
+  return `${READ_COUNT_KEY_PREFIX}${encodeURIComponent(slug)}`;
+}
+
+function loadLocalReadCounts(feeds) {
+  const counts = {};
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(READ_COUNTS_KEY) || '{}');
+    if (stored && typeof stored === 'object' && !Array.isArray(stored)) {
+      for (const [slug, count] of Object.entries(stored)) {
+        if (Number.isSafeInteger(count) && count >= 0) counts[slug] = count;
+      }
+    }
+  } catch {
+    // Ignore unavailable or invalid legacy storage.
+  }
+  for (const { slug } of feeds) {
+    try {
+      const stored = window.localStorage.getItem(readCountKey(slug));
+      if (stored !== null) {
+        const count = JSON.parse(stored);
+        if (Number.isSafeInteger(count) && count >= 0) counts[slug] = count;
+      }
+    } catch {
+      // Fall back to the legacy count if this entry cannot be read.
+    }
+  }
+  return counts;
+}
+
+function withReadCounts(feeds, counts) {
+  return feeds.map((feed) => {
+    const localReadCount = counts[feed.slug] || 0;
+    return {
+      ...feed,
+      localReadCount,
+      ...(feed.readerCount != null ? { readerCount: feed.readerCount + localReadCount } : {}),
+    };
+  });
+}
+
 export default function App() {
-  const [feeds] = useState(loadFeeds);
-  const [selectedFeed, setSelectedFeed] = useState(null);
+  const [baseFeeds] = useState(loadFeeds);
+  const [localReadCounts, setLocalReadCounts] = useState(() => loadLocalReadCounts(baseFeeds));
+  const readCountsRef = useRef(localReadCounts);
+  const [selectedSlug, setSelectedSlug] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const feedSectionRef = useRef(null);
+  const openedLinkRef = useRef(false);
+  const feeds = withReadCounts(baseFeeds, localReadCounts);
+  const selectedFeed = feeds.find((feed) => feed.slug === selectedSlug);
+
+  const recordRead = (slug) => {
+    const persisted = loadLocalReadCounts(baseFeeds);
+    const counts = { ...readCountsRef.current };
+    for (const [key, value] of Object.entries(persisted)) {
+      counts[key] = Math.max(counts[key] || 0, value);
+    }
+    counts[slug] = (counts[slug] || 0) + 1;
+    readCountsRef.current = counts;
+    setLocalReadCounts(counts);
+    try {
+      window.localStorage.setItem(readCountKey(slug), JSON.stringify(counts[slug]));
+    } catch {
+      // Keep the count available for this session if storage is unavailable.
+    }
+  };
+
+  useEffect(() => {
+    const syncReadCounts = (event) => {
+      if (event.storageArea !== window.localStorage || (event.key !== null && event.key !== READ_COUNTS_KEY && !event.key.startsWith(READ_COUNT_KEY_PREFIX))) return;
+      const counts = loadLocalReadCounts(baseFeeds);
+      readCountsRef.current = counts;
+      setLocalReadCounts(counts);
+    };
+    window.addEventListener('storage', syncReadCounts);
+    return () => window.removeEventListener('storage', syncReadCounts);
+  }, [baseFeeds]);
 
   // Activate magnetic scroll between Hero and Feed sections
   useMagneticScroll({
@@ -21,16 +97,20 @@ export default function App() {
   });
 
   useEffect(() => {
+    if (openedLinkRef.current) return;
+    openedLinkRef.current = true;
     const slug = new URLSearchParams(window.location.search).get('feed');
-    const linkedFeed = feeds.find((feed) => feed.slug === slug);
+    const linkedFeed = baseFeeds.find((feed) => feed.slug === slug);
     if (linkedFeed) {
-      setSelectedFeed(linkedFeed);
+      recordRead(linkedFeed.slug);
+      setSelectedSlug(linkedFeed.slug);
       setIsModalOpen(true);
     }
-  }, [feeds]);
+  }, [baseFeeds]);
 
   const handleSelectFeed = (feed) => {
-    setSelectedFeed(feed);
+    recordRead(feed.slug);
+    setSelectedSlug(feed.slug);
     setIsModalOpen(true);
   };
 

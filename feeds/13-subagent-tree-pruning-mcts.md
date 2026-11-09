@@ -1,5 +1,6 @@
 ---
 id: "subagent-tree-pruning-mcts"
+readers: 0
 title: "Monte Carlo Tree Search for Subagent Delegation and Backtracking"
 date: "2026-10-28"
 author: "Dr. Aris Thorne"

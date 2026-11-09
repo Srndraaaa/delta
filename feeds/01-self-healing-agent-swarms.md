@@ -1,5 +1,6 @@
 ---
 id: "self-healing-agent-swarms"
+readers: 0
 title: "Autonomous Multi-Agent Orchestration Patterns: From ReAct to Self-Healing Swarms"
 date: "2026-11-06"
 author: "Delta Research Lab"

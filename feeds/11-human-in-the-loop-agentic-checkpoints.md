@@ -1,5 +1,6 @@
 ---
 id: "human-in-the-loop-agentic-checkpoints"
+readers: 0
 title: "Asynchronous Human-in-the-Loop Checkpoints for Irreversible Financial Actions"
 date: "2026-11-01"
 author: "Amara Okafor"

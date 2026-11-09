@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/cutout-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Clock, ArrowUpRight, Filter, BookOpen } from '@keyline-icons/react';
+import { Search, Clock, ArrowUpRight, Filter, BookOpen, Users } from '@keyline-icons/react';
 
 function FeedCardItem({ feed, onSelectFeed }) {
   const stagger = useCutoutContentStaggerVariants();
@@ -28,7 +28,10 @@ function FeedCardItem({ feed, onSelectFeed }) {
       <button
         type="button"
         aria-label={`Read ${feed.title}`}
-        onClick={() => onSelectFeed(feed)}
+        onClick={(event) => {
+          event.stopPropagation();
+          onSelectFeed(feed);
+        }}
         className="absolute inset-0 z-10 w-full h-full rounded-[28px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-cyan-600"
       />
 
@@ -57,7 +60,7 @@ function FeedCardItem({ feed, onSelectFeed }) {
       </CutoutCardMedia>
 
       {/* Card Content with motion stagger animation (Light theme) */}
-      <CutoutCardContent className="flex-1 flex flex-col justify-between p-6 bg-white">
+      <CutoutCardContent className="flex-1 flex flex-col justify-between p-6 pb-16 bg-white">
         <motion.div
           animate="show"
           className="contents"
@@ -94,11 +97,19 @@ function FeedCardItem({ feed, onSelectFeed }) {
             </div>
 
             {/* Reading Time Footer */}
-            <CutoutCardFooter className="border-slate-100 border-t pt-4 justify-end">
-              <span className="text-slate-500 text-xs font-sans tabular-nums flex items-center gap-1 font-medium">
-                <Clock className="w-3 h-3 text-cyan-600" />
+            <CutoutCardFooter className="border-slate-100 border-t pt-4 justify-end flex-wrap gap-x-4 gap-y-2">
+              <span className="text-slate-600 text-xs font-sans tabular-nums flex items-center gap-1 font-medium">
+                <Clock aria-hidden="true" className="w-3 h-3 text-cyan-600" />
                 {feed.readingTime}
               </span>
+              {(feed.readerCount != null || feed.localReadCount > 0) && (
+                <span className="text-slate-600 text-xs font-sans tabular-nums flex items-center gap-1 font-medium">
+                  <Users aria-hidden="true" className="w-3 h-3 text-cyan-600" />
+                  {feed.readerCount != null
+                    ? `${feed.readerCount} ${feed.readerCount === 1 ? 'read' : 'reads'} (baseline + this browser)`
+                    : `${feed.localReadCount} ${feed.localReadCount === 1 ? 'read' : 'reads'} on this browser`}
+                </span>
+              )}
             </CutoutCardFooter>
           </motion.div>
         </motion.div>

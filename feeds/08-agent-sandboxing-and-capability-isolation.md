@@ -1,5 +1,6 @@
 ---
 id: "agent-sandboxing-and-capability-isolation"
+readers: 0
 title: "Zero-Trust Agent Sandboxing: Hardening MicroVMs and Capability Tokens"
 date: "2026-11-04"
 author: "Marcus Aurelius Chen"

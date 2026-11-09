@@ -42,7 +42,12 @@ export default function App() {
   const selectedFeed = feeds.find((feed) => feed.slug === selectedSlug);
 
   const recordRead = (slug) => {
-    const counts = { ...readCountsRef.current, [slug]: (readCountsRef.current[slug] || 0) + 1 };
+    const persisted = loadLocalReadCounts();
+    const counts = { ...readCountsRef.current };
+    for (const [key, value] of Object.entries(persisted)) {
+      counts[key] = Math.max(counts[key] || 0, value);
+    }
+    counts[slug] = (counts[slug] || 0) + 1;
     readCountsRef.current = counts;
     setLocalReadCounts(counts);
     try {
@@ -51,6 +56,17 @@ export default function App() {
       // Keep the count available for this session if storage is unavailable.
     }
   };
+
+  useEffect(() => {
+    const syncReadCounts = (event) => {
+      if (event.storageArea !== window.localStorage || (event.key !== READ_COUNTS_KEY && event.key !== null)) return;
+      const counts = loadLocalReadCounts();
+      readCountsRef.current = counts;
+      setLocalReadCounts(counts);
+    };
+    window.addEventListener('storage', syncReadCounts);
+    return () => window.removeEventListener('storage', syncReadCounts);
+  }, []);
 
   // Activate magnetic scroll between Hero and Feed sections
   useMagneticScroll({

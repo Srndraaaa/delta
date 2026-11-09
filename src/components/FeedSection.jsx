@@ -60,7 +60,7 @@ function FeedCardItem({ feed, onSelectFeed }) {
       </CutoutCardMedia>
 
       {/* Card Content with motion stagger animation (Light theme) */}
-      <CutoutCardContent className="flex-1 flex flex-col justify-between p-6 bg-white">
+      <CutoutCardContent className="flex-1 flex flex-col justify-between p-6 pb-16 bg-white">
         <motion.div
           animate="show"
           className="contents"

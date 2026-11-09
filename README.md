@@ -76,7 +76,7 @@ Karena aplikasi ini dikompilasi menjadi aset statis murni (`dist/`), Anda dapat 
 3. Pilih repositori `delta`.
 4. Isi build configuration:
    - **Framework preset**: `Vite`
-   - **Build command**: `npm run build`
+   - **Build command**: `bun run build`
    - **Build output directory**: `dist`
 5. Klik **Save and Deploy**. Website Anda langsung live dengan custom domain & SSL gratis!
 
@@ -101,27 +101,29 @@ Workflow GitHub Actions telah disediakan di `.github/workflows/deploy.yml`:
 
 ### 4. Netlify
 1. Buka [Netlify](https://app.netlify.com).
-2. Drag & drop folder `dist` setelah menjalankan `npm run build`, atau hubungkan ke GitHub repositori dengan command `npm run build` dan publish directory `dist`.
+2. Drag & drop folder `dist` setelah menjalankan `bun run build`, atau hubungkan ke GitHub repositori dengan command `bun run build` dan publish directory `dist`.
 
 ---
 
 ## 💻 Menjalankan di Komputer Lokal
 
+Instal [Bun](https://bun.sh/docs/installation) terlebih dahulu.
+
 ```bash
 # Install dependensi
-npm install
+bun install --frozen-lockfile
 
 # Jalankan server development lokal
-npm run dev
+bun run dev
 
 # Build untuk produksi
-npm run build
+bun run build
 
 # Preview hasil build
-npm run preview
+bun run preview
 
 # Jalankan tes unit dan komponen
-npm test
+bun run test
 ```
 
-Untuk pemeriksaan interaksi di browser, jalankan `npm run dev`, lalu buka `http://localhost:5173/tests/browser.html`. Hasil setiap pemeriksaan ditampilkan sebagai PASS atau FAIL.
+Untuk pemeriksaan interaksi di browser, jalankan `bun run dev`, lalu buka `http://localhost:5173/tests/browser.html`. Hasil setiap pemeriksaan ditampilkan sebagai PASS atau FAIL.

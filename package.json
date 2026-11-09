@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test"
+    "test": "bun test"
   },
   "dependencies": {
     "@keyline-icons/react": "^2.6.0",

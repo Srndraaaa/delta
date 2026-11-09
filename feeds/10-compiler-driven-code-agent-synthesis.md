@@ -1,5 +1,6 @@
 ---
 id: "compiler-driven-code-agent-synthesis"
+readers: 0
 title: "Compiler-Guided Code Generation: Integrating AST Linter Feedback into Agent Generation Loops"
 date: "2026-11-02"
 author: "Kenji Takahashi"

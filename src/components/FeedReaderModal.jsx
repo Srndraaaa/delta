@@ -4,7 +4,7 @@ import remarkGfm from 'remark-gfm';
 import { Dialog, DialogClose } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, Clock, User, Share2, Download } from '@keyline-icons/react';
+import { Calendar, Clock, User, Users, Share2, Download } from '@keyline-icons/react';
 
 export function FeedReaderModal({ feed, open, onOpenChange }) {
   const [copyStatus, setCopyStatus] = useState('');
@@ -103,6 +103,14 @@ export function FeedReaderModal({ feed, open, onOpenChange }) {
               <Clock className="w-3.5 h-3.5 text-slate-400" />
               {feed.readingTime}
             </span>
+            {(feed.readerCount != null || feed.localReadCount > 0) && (
+              <span className="flex items-center gap-1.5 text-slate-600">
+                <Users aria-hidden="true" className="w-3.5 h-3.5 text-slate-500" />
+                {feed.readerCount != null
+                  ? `${feed.readerCount} ${feed.readerCount === 1 ? 'read' : 'reads'} (baseline + this browser)`
+                  : `${feed.localReadCount} ${feed.localReadCount === 1 ? 'read' : 'reads'} on this browser`}
+              </span>
+            )}
           </div>
 
           <h1 id="feed-reader-title" className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 tracking-tight leading-snug">

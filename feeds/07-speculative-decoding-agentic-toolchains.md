@@ -1,5 +1,6 @@
 ---
 id: "speculative-decoding-agentic-toolchains"
+readers: 0
 title: "Speculative Decoding for High-Throughput Agentic Toolchains"
 date: "2026-11-05"
 author: "Dr. Elena Vance"

@@ -1,5 +1,6 @@
 ---
 id: "agent-evals-synthetic-environment-simulation"
+readers: 0
 title: "Benchmarking Multi-Step Agents Using Synthetic World Simulations & Red Teaming"
 date: "2026-10-20"
 author: "Zainab Al-Hassan"

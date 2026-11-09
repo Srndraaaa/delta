@@ -1,5 +1,6 @@
 ---
 id: "context-compaction-kv-cache-paging"
+readers: 0
 title: "KV-Cache Paging & Semantic Compression for 1M+ Token Agentic Sessions"
 date: "2026-10-24"
 author: "Dr. Laila Al-Mansoor"

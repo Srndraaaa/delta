@@ -1,5 +1,6 @@
 ---
 id: "neurosymbolic-planner-state-verification"
+readers: 0
 title: "Neurosymbolic Planners: Bridging LLM Creativity with Formal SAT Solver Guarantees"
 date: "2026-10-30"
 author: "Prof. Henrik Lindqvist"

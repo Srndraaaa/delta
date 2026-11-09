@@ -1,5 +1,6 @@
 ---
 id: "multi-modal-gui-browser-agents"
+readers: 0
 title: "Vision-Language Grounding for Web Navigation and Complex GUI Manipulation"
 date: "2026-10-22"
 author: "Chen Wei & Ananya Rao"

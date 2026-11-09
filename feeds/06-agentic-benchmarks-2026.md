@@ -1,5 +1,6 @@
 ---
 id: "agentic-benchmarks-2026"
+readers: 0
 title: "Delta Benchmark Report 2026: Evaluating Multi-Agent Coordination Across 500 Tasks"
 date: "2026-10-25"
 author: "Delta Research Lab"

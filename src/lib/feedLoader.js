@@ -51,6 +51,10 @@ export function parseMarkdown(rawContent, fallbackFilename = '') {
   const summary = metadata.summary || content.slice(0, 180).replace(/[#*`_]/g, '') + '...';
   const image = metadata.image || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop';
   const badge = metadata.badge || null;
+  const readers = metadata.readers;
+  const readerCount = typeof readers === 'string' && /^\d+$/.test(readers) && Number.isSafeInteger(Number(readers))
+    ? Number(readers)
+    : undefined;
 
   return {
     slug,
@@ -63,6 +67,7 @@ export function parseMarkdown(rawContent, fallbackFilename = '') {
     summary,
     image,
     badge,
+    ...(readerCount !== undefined ? { readerCount } : {}),
     content,
     raw: rawContent,
   };

@@ -1,5 +1,6 @@
 ---
 id: "hierarchical-memory-architectures"
+readers: 0
 title: "Episodic vs Semantic Memory Consolidation for Persistent Autonomous Workspaces"
 date: "2026-10-29"
 author: "D.Rendra ~ Delta Research"

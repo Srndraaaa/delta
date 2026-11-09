@@ -7,11 +7,50 @@ import { Footer } from './components/Footer';
 import { loadFeeds } from './lib/feedLoader';
 import { useMagneticScroll } from './hooks/useMagneticScroll';
 
+const READ_COUNTS_KEY = 'delta-feed-local-read-counts';
+
+function loadLocalReadCounts() {
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(READ_COUNTS_KEY) || '{}');
+    if (!stored || typeof stored !== 'object' || Array.isArray(stored)) return {};
+    return Object.fromEntries(Object.entries(stored).filter(([, count]) => Number.isSafeInteger(count) && count >= 0));
+  } catch {
+    return {};
+  }
+}
+
+function withReadCounts(feeds, counts) {
+  return feeds.map((feed) => {
+    const localReadCount = counts[feed.slug] || 0;
+    return {
+      ...feed,
+      localReadCount,
+      ...(feed.readerCount != null ? { readerCount: feed.readerCount + localReadCount } : {}),
+    };
+  });
+}
+
 export default function App() {
-  const [feeds] = useState(loadFeeds);
-  const [selectedFeed, setSelectedFeed] = useState(null);
+  const [baseFeeds] = useState(loadFeeds);
+  const [localReadCounts, setLocalReadCounts] = useState(loadLocalReadCounts);
+  const readCountsRef = useRef(localReadCounts);
+  const [selectedSlug, setSelectedSlug] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const feedSectionRef = useRef(null);
+  const openedLinkRef = useRef(false);
+  const feeds = withReadCounts(baseFeeds, localReadCounts);
+  const selectedFeed = feeds.find((feed) => feed.slug === selectedSlug);
+
+  const recordRead = (slug) => {
+    const counts = { ...readCountsRef.current, [slug]: (readCountsRef.current[slug] || 0) + 1 };
+    readCountsRef.current = counts;
+    setLocalReadCounts(counts);
+    try {
+      window.localStorage.setItem(READ_COUNTS_KEY, JSON.stringify(counts));
+    } catch {
+      // Keep the count available for this session if storage is unavailable.
+    }
+  };
 
   // Activate magnetic scroll between Hero and Feed sections
   useMagneticScroll({
@@ -21,16 +60,20 @@ export default function App() {
   });
 
   useEffect(() => {
+    if (openedLinkRef.current) return;
+    openedLinkRef.current = true;
     const slug = new URLSearchParams(window.location.search).get('feed');
-    const linkedFeed = feeds.find((feed) => feed.slug === slug);
+    const linkedFeed = baseFeeds.find((feed) => feed.slug === slug);
     if (linkedFeed) {
-      setSelectedFeed(linkedFeed);
+      recordRead(linkedFeed.slug);
+      setSelectedSlug(linkedFeed.slug);
       setIsModalOpen(true);
     }
-  }, [feeds]);
+  }, [baseFeeds]);
 
   const handleSelectFeed = (feed) => {
-    setSelectedFeed(feed);
+    recordRead(feed.slug);
+    setSelectedSlug(feed.slug);
     setIsModalOpen(true);
   };
 

@@ -1,4 +1,4 @@
-import { after, before, test } from 'node:test';
+import { afterAll, beforeAll, test } from 'bun:test';
 import assert from 'node:assert/strict';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -12,21 +12,21 @@ let Navbar;
 let Footer;
 let LogoLoopSection;
 
-const feed = {
-  slug: 'example', title: 'Example research', summary: 'Summary', tags: [],
-  author: 'Researcher', category: 'Research', content: 'Content', readingTime: '1 min read',
-};
-
-before(async () => {
+beforeAll(async () => {
   server = await createServer({ server: { middlewareMode: true }, appType: 'custom', logLevel: 'error' });
   ({ FeedSection } = await server.ssrLoadModule('/src/components/FeedSection.jsx'));
   ({ FeedReaderModal } = await server.ssrLoadModule('/src/components/FeedReaderModal.jsx'));
   ({ Navbar } = await server.ssrLoadModule('/src/components/Navbar.jsx'));
   ({ Footer } = await server.ssrLoadModule('/src/components/Footer.jsx'));
   ({ LogoLoopSection } = await server.ssrLoadModule('/src/components/LogoLoopSection.jsx'));
-});
+}, 60000);
 
-after(async () => { await server?.close(); });
+afterAll(async () => { await server?.close(); });
+const feed = {
+  slug: 'example', title: 'Example research', summary: 'Summary', tags: [],
+  author: 'Researcher', category: 'Research', content: 'Content', readingTime: '1 min read',
+};
+
 
 test('missing article metadata does not invent a date or author', () => {
   const parsed = parseMarkdown('# Article', 'article.md');

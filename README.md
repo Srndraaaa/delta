@@ -30,7 +30,10 @@ Dibangun berdasarkan spesifikasi dari **DESIGN.md** oleh **D.Rendra ~ 2026**.
    - Display & Heading: **Space Grotesk**
    - Body & Text: **Plus Jakarta Sans**
    - Code & Meta: **JetBrains Mono**
-6. **Footer**:
+6. **Navigasi Melayang (Dynamic Island)**:
+   - Navigasi tampil sebagai pulau melayang di atas konten dengan latar kaca gelap, garis tepi tipis, dan bayangan elevasi.
+   - Aksi **Research Feed** tetap menggulir ke bagian feed, dengan fokus keyboard yang terlihat dan preferensi reduced motion dihormati.
+7. **Footer**:
    - Branding dan informasi kurator Delta Feed.
 
 ---

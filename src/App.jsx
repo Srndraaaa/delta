@@ -165,6 +165,8 @@ export default function App() {
       {/* Research Paper / Article Markdown Reader Modal */}
       <FeedReaderModal
         feed={selectedFeed}
+        feeds={feeds}
+        onSelectFeed={handleSelectFeed}
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
       />

@@ -17,12 +17,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, Clock, ArrowUpRight, Filter, BookOpen, Users } from '@keyline-icons/react';
 
-function FeedCardItem({ feed, onSelectFeed }) {
+function FeedCardItem({ feed, onSelectFeed, isLead = false }) {
   const stagger = useCutoutContentStaggerVariants();
 
   return (
     <CutoutCard
-      className={cutoutCardSurfaceClassName}
+      className={`${cutoutCardSurfaceClassName} ${
+        isLead ? 'md:col-span-2 lg:col-span-3 md:flex md:flex-row' : 'flex flex-col'
+      }`}
       onClick={() => onSelectFeed(feed)}
     >
       <button
@@ -36,7 +38,9 @@ function FeedCardItem({ feed, onSelectFeed }) {
       />
 
       {/* Media section with image and cutout corners */}
-      <CutoutCardMedia className="h-60 sm:h-64">
+      <CutoutCardMedia
+        className={isLead ? 'h-64 md:h-auto md:w-[46%] md:min-h-[300px] shrink-0' : 'h-56 sm:h-60'}
+      >
         <CutoutCardImage
           alt={feed.title}
           src={feed.image}
@@ -60,7 +64,11 @@ function FeedCardItem({ feed, onSelectFeed }) {
       </CutoutCardMedia>
 
       {/* Card Content with motion stagger animation (Light theme) */}
-      <CutoutCardContent className="flex-1 flex flex-col justify-between p-6 pb-16 bg-white">
+      <CutoutCardContent
+        className={`flex-1 flex flex-col justify-between bg-white ${
+          isLead ? 'p-6 sm:p-8 pb-16' : 'p-6 pb-16'
+        }`}
+      >
         <motion.div
           animate="show"
           className="contents"
@@ -69,14 +77,18 @@ function FeedCardItem({ feed, onSelectFeed }) {
         >
           <div>
             <motion.h2
-              className="text-slate-900 mb-2 text-xl font-display leading-snug font-semibold group-hover/cutout:text-cyan-600 transition-colors line-clamp-2"
+              className={`text-slate-900 mb-2.5 font-display leading-snug font-semibold group-hover/cutout:text-cyan-700 transition-colors ${
+                isLead ? 'text-2xl sm:text-[1.65rem] line-clamp-2' : 'text-xl line-clamp-2'
+              }`}
               variants={stagger.item}
             >
               {feed.title}
             </motion.h2>
 
             <motion.p
-              className="text-slate-600 mb-4 text-xs font-sans leading-relaxed line-clamp-3"
+              className={`text-slate-600 mb-4 font-sans leading-relaxed ${
+                isLead ? 'text-sm sm:text-[15px] line-clamp-4' : 'text-[13px] line-clamp-3'
+              }`}
               variants={stagger.item}
             >
               {feed.summary}
@@ -86,10 +98,10 @@ function FeedCardItem({ feed, onSelectFeed }) {
           <motion.div variants={stagger.item} className="space-y-4">
             {/* Tags in light mode */}
             <div className="flex flex-wrap gap-1.5">
-              {feed.tags.slice(0, 3).map((tag, tIdx) => (
+              {feed.tags.slice(0, isLead ? 4 : 3).map((tag, tIdx) => (
                 <span
                   key={tIdx}
-                  className="text-[10px] font-sans px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200/80 font-medium"
+                  className="text-[11px] font-sans px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200/80 font-medium"
                 >
                   #{tag}
                 </span>
@@ -97,7 +109,7 @@ function FeedCardItem({ feed, onSelectFeed }) {
             </div>
 
             {/* Reading Time Footer */}
-            <CutoutCardFooter className="border-slate-100 border-t pt-4 justify-end flex-wrap gap-x-4 gap-y-2">
+            <CutoutCardFooter className="border-slate-100 border-t pt-4 justify-start flex-wrap gap-x-4 gap-y-2 pr-32">
               <span className="text-slate-600 text-xs font-sans tabular-nums flex items-center gap-1 font-medium">
                 <Clock aria-hidden="true" className="w-3 h-3 text-cyan-600" />
                 {feed.readingTime}
@@ -115,16 +127,17 @@ function FeedCardItem({ feed, onSelectFeed }) {
         </motion.div>
       </CutoutCardContent>
 
-      {/* Action button revealed on hover */}
-      <CutoutCardAction className="right-5 bottom-4 z-20">
+      {/* Action button always visible so touch users & scanners see clear CTA */}
+      <CutoutCardAction revealOnHover={false} className="right-5 bottom-4 z-20">
         <button
           onClick={(e) => {
             e.stopPropagation();
             onSelectFeed(feed);
           }}
-          className="bg-slate-900 hover:bg-slate-800 text-white rounded-full px-4 py-1.5 text-xs font-sans font-semibold shadow-md transition-transform duration-150 active:scale-95 flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-slate-900 cursor-pointer"
+          tabIndex={-1}
+          aria-hidden="true"
+          className="bg-slate-100 text-slate-800 group-hover/cutout:bg-slate-900 group-hover/cutout:text-white rounded-full px-3.5 py-1.5 text-xs font-sans font-semibold border border-slate-200/80 group-hover/cutout:border-slate-900 shadow-xs transition-colors duration-200 flex items-center gap-1.5 cursor-pointer"
           type="button"
-          aria-label={`Read ${feed.title}`}
         >
           <span>Read Paper</span>
           <ArrowUpRight className="w-3.5 h-3.5" />
@@ -263,6 +276,7 @@ export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
               <FeedCardItem
                 key={feed.slug || index}
                 feed={feed}
+                isLead={!searchQuery && selectedCategory === 'All' && filteredFeeds.length > 1 && index === 0}
                 onSelectFeed={onSelectFeed}
               />
             ))}

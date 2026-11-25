@@ -105,6 +105,29 @@ test('reader uses a named native dialog', () => {
   assert.match(html, /id="feed-reader-title"/);
 });
 
+test('reader strips duplicate leading title, shows section jump and theme toggle', () => {
+  const richFeed = {
+    ...feed,
+    summary: 'Short editorial summary.',
+    content: '# Example research\n\n## Section One\n\nBody text.\n\n## Section Two\n\nMore text.',
+  };
+  const nextFeed = { ...feed, slug: 'next-one', title: 'Next Dispatch' };
+  const html = renderToStaticMarkup(
+    React.createElement(FeedReaderModal, {
+      feed: richFeed,
+      feeds: [richFeed, nextFeed],
+      onSelectFeed() {},
+      open: true,
+      onOpenChange() {},
+    })
+  );
+  assert.equal(html.match(/<h1\b/g)?.length, 1);
+  assert.match(html, /Short editorial summary\./);
+  assert.match(html, /aria-label="Article sections"/);
+  assert.match(html, /aria-label="Switch to dark theme"/);
+  assert.match(html, /Next Dispatch/);
+});
+
 test('navigation, footer and logo labels avoid unsupported claims', () => {
   const html = [Navbar, Footer, LogoLoopSection].map((Component) => renderToStaticMarkup(React.createElement(Component))).join(' ');
   assert.doesNotMatch(html, /Node status:|Autonomous Protocol|Technology Partners|title="Source Code"/);

@@ -75,7 +75,7 @@ test('cards show reading time without the author', () => {
 });
 
 test('cards show known counts, including zero, without inventing missing counts', () => {
-  for (const [count, label] of [[0, '0 reads (baseline + this browser)'], [1, '1 read (baseline + this browser)'], [42, '42 reads (baseline + this browser)']]) {
+  for (const [count, label] of [[0, '0 reads (incl. local)'], [1, '1 read (incl. local)'], [42, '42 reads (incl. local)']]) {
     const html = renderToStaticMarkup(React.createElement(FeedSection, {
       feeds: [{ ...feed, readerCount: count }], onSelectFeed() {},
     }));
@@ -89,14 +89,14 @@ test('cards identify browser-only reads when no baseline exists', () => {
   const html = renderToStaticMarkup(React.createElement(FeedSection, {
     feeds: [{ ...feed, localReadCount: 2 }], onSelectFeed() {},
   }));
-  assert.match(html, /2 reads on this browser/);
-  assert.doesNotMatch(html, /baseline/);
+  assert.match(html, /2 reads \(this browser\)/);
+  assert.match(html, /Opened/);
 });
 
 test('feed labels do not claim live sync or a fixed number of rows', () => {
   const html = renderToStaticMarkup(React.createElement(FeedSection, { feeds: [feed], onSelectFeed() {} }));
   assert.match(html, /Showing 1 research publications/);
-  assert.doesNotMatch(html, /Live Research Repository|sync active|2-row Cutout Card grid/);
+  assert.doesNotMatch(html, /Live Research Repository|sync active|2-row Cutout Card grid|feeds\//);
 });
 
 test('reader uses a named native dialog', () => {
@@ -105,7 +105,7 @@ test('reader uses a named native dialog', () => {
   assert.match(html, /id="feed-reader-title"/);
 });
 
-test('reader strips duplicate leading title, shows section jump and theme toggle', () => {
+test('reader strips duplicate leading title, shows section jump, provenance note and theme toggle', () => {
   const richFeed = {
     ...feed,
     summary: 'Short editorial summary.',
@@ -125,7 +125,26 @@ test('reader strips duplicate leading title, shows section jump and theme toggle
   assert.match(html, /Short editorial summary\./);
   assert.match(html, /aria-label="Article sections"/);
   assert.match(html, /aria-label="Switch to dark theme"/);
+  assert.match(html, /Editorial note:/);
   assert.match(html, /Next Dispatch/);
+});
+
+test('frontmatter parses optional source and references when provided', () => {
+  const parsed = parseMarkdown('---\nsource: "Internal lab"\nreferences: ["https://example.com/paper"]\n---\nBody');
+  assert.equal(parsed.source, 'Internal lab');
+  assert.deepEqual(parsed.references, ['https://example.com/paper']);
+});
+
+test('reader renders mermaid fences with the diagram container', () => {
+  const mermaidFeed = {
+    ...feed,
+    content: '```mermaid\ngraph TD\n  A-->B\n```',
+  };
+  const html = renderToStaticMarkup(
+    React.createElement(FeedReaderModal, { feed: mermaidFeed, open: true, onOpenChange() {} })
+  );
+  assert.match(html, /MERMAID DIAGRAM/);
+  assert.doesNotMatch(html, /Copy MERMAID block/);
 });
 
 test('navigation, footer and logo labels avoid unsupported claims', () => {

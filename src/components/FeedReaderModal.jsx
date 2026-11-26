@@ -1,8 +1,9 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, memo, useContext, useEffect, useId, useMemo, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Dialog, DialogClose } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { formatReadCount } from '@/lib/feedLoader';
 import {
   Calendar,
   Clock,
@@ -16,6 +17,7 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
+  ArrowUpRight,
 } from '@keyline-icons/react';
 
 function slugifyHeading(text) {
@@ -60,6 +62,76 @@ function extractSections(markdown = '') {
   return sections;
 }
 
+const ReaderThemeContext = createContext(false);
+const mermaidSvgCache = new Map();
+
+function MermaidDiagram({ chart }) {
+  const isDark = useContext(ReaderThemeContext);
+  const rawId = useId();
+  const renderId = `mermaid-${rawId.replace(/[^a-zA-Z0-9_-]/g, '')}`;
+  const cacheKey = `${isDark ? 'd' : 'l'}:${chart}`;
+  const [svg, setSvg] = useState(() => mermaidSvgCache.get(cacheKey) || '');
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    const cached = mermaidSvgCache.get(cacheKey);
+    if (cached) {
+      setSvg(cached);
+      setFailed(false);
+      return undefined;
+    }
+
+    let active = true;
+    setFailed(false);
+
+    import('mermaid')
+      .then(async ({ default: mermaid }) => {
+        mermaid.initialize({
+          startOnLoad: false,
+          securityLevel: 'strict',
+          theme: isDark ? 'dark' : 'neutral',
+          fontFamily: 'Plus Jakarta Sans, sans-serif',
+        });
+        const { svg: rendered } = await mermaid.render(`${renderId}-${isDark ? 'd' : 'l'}`, chart);
+        mermaidSvgCache.set(cacheKey, rendered);
+        if (active) setSvg(rendered);
+      })
+      .catch(() => {
+        if (active) setFailed(true);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [cacheKey, chart, isDark, renderId]);
+
+  if (failed || !svg) {
+    return (
+      <div className="my-6 overflow-hidden rounded-xl border border-slate-800 bg-[#0b1120] shadow-sm">
+        <div className="border-b border-slate-800/90 bg-slate-900/90 px-4 py-2 text-[11px] font-mono tracking-wider text-slate-400">
+          MERMAID DIAGRAM
+        </div>
+        <pre className="!border-0 !rounded-none !bg-transparent">
+          <code>{chart}</code>
+        </pre>
+      </div>
+    );
+  }
+
+  return (
+    <figure
+      className={`my-6 overflow-hidden rounded-xl border ${
+        isDark ? 'border-slate-800 bg-slate-900/70' : 'border-stone-200/90 bg-white'
+      }`}
+    >
+      <div
+        className="overflow-x-auto p-4 sm:p-6 flex justify-center [&_svg]:max-w-full [&_svg]:h-auto"
+        dangerouslySetInnerHTML={{ __html: svg }}
+      />
+    </figure>
+  );
+}
+
 function CodeBlock({ children }) {
   const [copied, setCopied] = useState(false);
   const child = React.Children.toArray(children)[0];
@@ -67,7 +139,12 @@ function CodeBlock({ children }) {
   const rawText = getNodeText(child).replace(/\n$/, '');
   const langMatch = className.match(/language-([\w-]+)/);
   const lang = langMatch ? langMatch[1].toLowerCase() : 'diagram';
-  const label = lang === 'mermaid' ? 'Architecture Diagram (Mermaid)' : lang.toUpperCase();
+
+  if (lang === 'mermaid') {
+    return <MermaidDiagram chart={rawText} />;
+  }
+
+  const label = lang.toUpperCase();
 
   const handleCopy = async () => {
     try {
@@ -98,7 +175,53 @@ function CodeBlock({ children }) {
   );
 }
 
-export function FeedReaderModal({ feed, open, onOpenChange, feeds = [], onSelectFeed }) {
+function MarkdownH2({ children }) {
+  const id = slugifyHeading(getNodeText(children));
+  return (
+    <h2 id={id} className="scroll-mt-6">
+      {children}
+    </h2>
+  );
+}
+
+function MarkdownTable({ children }) {
+  const isDark = useContext(ReaderThemeContext);
+  return (
+    <div
+      className={`my-6 w-full overflow-x-auto rounded-xl border ${
+        isDark ? 'border-slate-800 bg-slate-900/50' : 'border-slate-200/90 bg-white'
+      }`}
+    >
+      <table>{children}</table>
+    </div>
+  );
+}
+
+// Keep component references module-stable so scroll progress updates never remount diagrams.
+const MARKDOWN_COMPONENTS = {
+  h2: MarkdownH2,
+  pre: CodeBlock,
+  table: MarkdownTable,
+};
+
+const ArticleMarkdown = memo(function ArticleMarkdown({ content }) {
+  return (
+    <div className="prose-delta max-w-none">
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={MARKDOWN_COMPONENTS}>
+        {content}
+      </ReactMarkdown>
+    </div>
+  );
+});
+
+export function FeedReaderModal({
+  feed,
+  open,
+  onOpenChange,
+  feeds = [],
+  onSelectFeed,
+  onSelectTag,
+}) {
   const [copyStatus, setCopyStatus] = useState('');
   const [readerTheme, setReaderTheme] = useState('paper');
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -132,11 +255,14 @@ export function FeedReaderModal({ feed, open, onOpenChange, feeds = [], onSelect
   if (!feed) return null;
 
   const isDark = readerTheme === 'dark';
+  const readCountLabel = formatReadCount(feed);
+  const hasReferences = Boolean(feed.source || feed.references?.length);
 
   const handleScroll = (event) => {
     const el = event.currentTarget;
     const maxScroll = el.scrollHeight - el.clientHeight;
-    setScrollProgress(maxScroll > 0 ? Math.min(100, Math.round((el.scrollTop / maxScroll) * 100)) : 0);
+    const next = maxScroll > 0 ? Math.min(100, Math.round((el.scrollTop / maxScroll) * 100)) : 0;
+    setScrollProgress((prev) => (prev === next ? prev : next));
   };
 
   const scrollToSection = (id) => {
@@ -167,29 +293,9 @@ export function FeedReaderModal({ feed, open, onOpenChange, feeds = [], onSelect
     URL.revokeObjectURL(url);
   };
 
-  const markdownComponents = {
-    h2: ({ children }) => {
-      const id = slugifyHeading(getNodeText(children));
-      return (
-        <h2 id={id} className="scroll-mt-6">
-          {children}
-        </h2>
-      );
-    },
-    pre: ({ children }) => <CodeBlock>{children}</CodeBlock>,
-    table: ({ children }) => (
-      <div
-        className={`my-6 w-full overflow-x-auto rounded-xl border ${
-          isDark ? 'border-slate-800 bg-slate-900/50' : 'border-slate-200/90 bg-white'
-        }`}
-      >
-        <table>{children}</table>
-      </div>
-    ),
-  };
-
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} labelledBy="feed-reader-title">
+    <ReaderThemeContext.Provider value={isDark}>
+      <Dialog open={open} onOpenChange={onOpenChange} labelledBy="feed-reader-title">
       <div
         data-reader-theme={readerTheme}
         className={`flex flex-1 min-h-0 flex-col transition-colors duration-200 ${
@@ -215,11 +321,11 @@ export function FeedReaderModal({ feed, open, onOpenChange, feeds = [], onSelect
               {feed.category || 'Research'}
             </span>
             <span
-              className={`text-xs font-mono hidden sm:inline truncate ${
+              className={`text-xs font-sans hidden sm:inline truncate ${
                 isDark ? 'text-slate-400' : 'text-slate-500'
               }`}
             >
-              feeds/{feed.slug}.md
+              {feed.date || 'Research Dispatch'}
             </span>
           </div>
 
@@ -307,6 +413,19 @@ export function FeedReaderModal({ feed, open, onOpenChange, feeds = [], onSelect
           className="flex-1 min-h-0 overflow-y-auto px-5 sm:px-10 py-8 sm:py-10"
         >
           <article className="mx-auto max-w-[66ch]">
+            {feed.image && (
+              <div className="mb-7 overflow-hidden rounded-2xl border border-black/10">
+                <img
+                  src={feed.image}
+                  alt={feed.title}
+                  onError={(e) => {
+                    e.currentTarget.parentElement.style.display = 'none';
+                  }}
+                  className="h-44 sm:h-56 w-full object-cover"
+                />
+              </div>
+            )}
+
             {/* Paper Metadata Banner */}
             <header
               className={`mb-8 border-b pb-6 ${
@@ -338,12 +457,10 @@ export function FeedReaderModal({ feed, open, onOpenChange, feeds = [], onSelect
                   <Clock className="w-3.5 h-3.5 opacity-70" />
                   {feed.readingTime}
                 </span>
-                {(feed.readerCount != null || feed.localReadCount > 0) && (
+                {readCountLabel && (
                   <span className="flex items-center gap-1.5">
                     <Users aria-hidden="true" className="w-3.5 h-3.5 opacity-70" />
-                    {feed.readerCount != null
-                      ? `${feed.readerCount} ${feed.readerCount === 1 ? 'read' : 'reads'} (baseline + this browser)`
-                      : `${feed.localReadCount} ${feed.localReadCount === 1 ? 'read' : 'reads'} on this browser`}
+                    {readCountLabel}
                   </span>
                 )}
               </div>
@@ -369,18 +486,33 @@ export function FeedReaderModal({ feed, open, onOpenChange, feeds = [], onSelect
 
               {feed.tags && feed.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-5">
-                  {feed.tags.map((tag, idx) => (
-                    <span
-                      key={idx}
-                      className={`text-xs font-sans px-2.5 py-0.5 rounded-full border font-medium ${
-                        isDark
-                          ? 'bg-slate-800/80 text-slate-300 border-slate-700'
-                          : 'bg-stone-100 text-slate-700 border-stone-200/90'
-                      }`}
-                    >
-                      #{tag}
-                    </span>
-                  ))}
+                  {feed.tags.map((tag, idx) =>
+                    onSelectTag ? (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => onSelectTag(tag)}
+                        className={`min-h-11 px-3 py-1 rounded-full border text-xs font-sans font-medium transition-colors cursor-pointer ${
+                          isDark
+                            ? 'bg-slate-800/80 text-slate-300 border-slate-700 hover:border-cyan-500 hover:text-cyan-300'
+                            : 'bg-stone-100 text-slate-700 border-stone-200/90 hover:border-cyan-600 hover:text-cyan-800'
+                        }`}
+                      >
+                        #{tag}
+                      </button>
+                    ) : (
+                      <span
+                        key={idx}
+                        className={`text-xs font-sans px-2.5 py-0.5 rounded-full border font-medium ${
+                          isDark
+                            ? 'bg-slate-800/80 text-slate-300 border-slate-700'
+                            : 'bg-stone-100 text-slate-700 border-stone-200/90'
+                        }`}
+                      >
+                        #{tag}
+                      </span>
+                    )
+                  )}
                 </div>
               )}
             </header>
@@ -422,17 +554,60 @@ export function FeedReaderModal({ feed, open, onOpenChange, feeds = [], onSelect
             )}
 
             {/* Markdown Rendered Content */}
-            <div className="prose-delta max-w-none">
-              <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-                {articleBody}
-              </ReactMarkdown>
-            </div>
+            <ArticleMarkdown content={articleBody} />
+
+            {/* Sources / Editorial Provenance Note */}
+            <aside
+              aria-label="Sources and methodology"
+              className={`mt-10 rounded-xl border p-4 text-xs font-sans leading-relaxed ${
+                isDark
+                  ? 'border-slate-800 bg-slate-900/50 text-slate-400'
+                  : 'border-stone-200/90 bg-[#f6f4ee] text-slate-600'
+              }`}
+            >
+              {hasReferences ? (
+                <div className="space-y-2">
+                  <p className={`font-semibold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                    Sources & References
+                  </p>
+                  {feed.source && <p>{feed.source}</p>}
+                  {feed.references?.length > 0 && (
+                    <ul className="list-disc pl-5 space-y-1">
+                      {feed.references.map((ref, idx) => (
+                        <li key={idx}>
+                          {/^https?:\/\//.test(ref) ? (
+                            <a
+                              href={ref}
+                              target="_blank"
+                              rel="noreferrer noopener"
+                              className="inline-flex items-center gap-1 underline text-cyan-600 hover:text-cyan-500"
+                            >
+                              <span>{ref}</span>
+                              <ArrowUpRight className="w-3 h-3" />
+                            </a>
+                          ) : (
+                            ref
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ) : (
+                <p>
+                  <strong className={isDark ? 'text-slate-200' : 'text-slate-800'}>
+                    Editorial note:
+                  </strong>{' '}
+                  This dispatch is an engineering synthesis brief; figures and benchmark examples summarize representative scenarios without external citations attached yet.
+                </p>
+              )}
+            </aside>
 
             {/* Previous / Next Dispatch Navigation */}
             {onSelectFeed && (prevFeed || nextFeed) && (
               <nav
                 aria-label="Adjacent dispatches"
-                className={`mt-12 pt-6 border-t grid grid-cols-1 sm:grid-cols-2 gap-3 ${
+                className={`mt-8 pt-6 border-t grid grid-cols-1 sm:grid-cols-2 gap-3 ${
                   isDark ? 'border-slate-800' : 'border-stone-200'
                 }`}
               >
@@ -512,5 +687,6 @@ export function FeedReaderModal({ feed, open, onOpenChange, feeds = [], onSelect
         </div>
       </div>
     </Dialog>
+    </ReaderThemeContext.Provider>
   );
 }

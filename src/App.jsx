@@ -57,10 +57,23 @@ export default function App() {
   const readCountsRef = useRef(localReadCounts);
   const [selectedSlug, setSelectedSlug] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const feedSectionRef = useRef(null);
   const openedLinkRef = useRef(false);
   const feeds = withReadCounts(baseFeeds, localReadCounts);
   const selectedFeed = feeds.find((feed) => feed.slug === selectedSlug);
+
+  const syncFeedUrl = (slug) => {
+    const url = new URL(window.location.href);
+    const current = url.searchParams.get('feed');
+    if ((slug || null) === current) return;
+    if (slug) {
+      url.searchParams.set('feed', slug);
+    } else {
+      url.searchParams.delete('feed');
+    }
+    window.history.pushState({ feed: slug || null }, '', url);
+  };
 
   const recordRead = (slug) => {
     const persisted = loadLocalReadCounts(baseFeeds);
@@ -108,10 +121,33 @@ export default function App() {
     }
   }, [baseFeeds]);
 
+  useEffect(() => {
+    const handlePopState = () => {
+      const slug = new URLSearchParams(window.location.search).get('feed');
+      const linkedFeed = baseFeeds.find((feed) => feed.slug === slug);
+      if (linkedFeed) {
+        setSelectedSlug(linkedFeed.slug);
+        setIsModalOpen(true);
+      } else {
+        setIsModalOpen(false);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [baseFeeds]);
+
   const handleSelectFeed = (feed) => {
     recordRead(feed.slug);
     setSelectedSlug(feed.slug);
     setIsModalOpen(true);
+    syncFeedUrl(feed.slug);
+  };
+
+  const handleModalOpenChange = (nextOpen) => {
+    setIsModalOpen(nextOpen);
+    if (!nextOpen) {
+      syncFeedUrl(null);
+    }
   };
 
   const scrollToFeeds = () => {
@@ -119,6 +155,12 @@ export default function App() {
       const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
       feedSectionRef.current.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth' });
     }
+  };
+
+  const handleSelectTag = (tag) => {
+    setSearchQuery(tag);
+    handleModalOpenChange(false);
+    scrollToFeeds();
   };
 
   return (
@@ -146,6 +188,8 @@ export default function App() {
             feeds={feeds}
             onSelectFeed={handleSelectFeed}
             feedSectionRef={feedSectionRef}
+            searchQuery={searchQuery}
+            onSearchQueryChange={setSearchQuery}
           />
 
           {/* Soft white to black gradient transition to footer */}
@@ -167,8 +211,9 @@ export default function App() {
         feed={selectedFeed}
         feeds={feeds}
         onSelectFeed={handleSelectFeed}
+        onSelectTag={handleSelectTag}
         open={isModalOpen}
-        onOpenChange={setIsModalOpen}
+        onOpenChange={handleModalOpenChange}
       />
     </div>
   );

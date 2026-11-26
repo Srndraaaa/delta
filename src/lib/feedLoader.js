@@ -51,6 +51,10 @@ export function parseMarkdown(rawContent, fallbackFilename = '') {
   const summary = metadata.summary || content.slice(0, 180).replace(/[#*`_]/g, '') + '...';
   const image = metadata.image || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop';
   const badge = metadata.badge || null;
+  const source = typeof metadata.source === 'string' ? metadata.source : '';
+  const references = Array.isArray(metadata.references)
+    ? metadata.references
+    : (metadata.references ? [metadata.references] : []);
   const readers = metadata.readers;
   const readerCount = typeof readers === 'string' && /^\d+$/.test(readers) && Number.isSafeInteger(Number(readers))
     ? Number(readers)
@@ -67,10 +71,26 @@ export function parseMarkdown(rawContent, fallbackFilename = '') {
     summary,
     image,
     badge,
+    ...(source ? { source } : {}),
+    ...(references.length ? { references } : {}),
     ...(readerCount !== undefined ? { readerCount } : {}),
     content,
     raw: rawContent,
   };
+}
+
+/**
+ * Formats reader count concisely while distinguishing local vs baseline counts.
+ */
+export function formatReadCount(feed) {
+  if (!feed) return null;
+  if (feed.readerCount != null) {
+    return `${feed.readerCount} ${feed.readerCount === 1 ? 'read' : 'reads'} (incl. local)`;
+  }
+  if (feed.localReadCount > 0) {
+    return `${feed.localReadCount} ${feed.localReadCount === 1 ? 'read' : 'reads'} (this browser)`;
+  }
+  return null;
 }
 
 /**

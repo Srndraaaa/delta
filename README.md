@@ -1,132 +1,99 @@
-# Delta Feed: Research News for the Latest Agentic AI
+# Delta Feed
 
-Delta Feed adalah platform web modern untuk kurasi riset kecerdasan buatan otonom (**Agentic AI**), dibangun menggunakan React, Vite, Tailwind CSS, dan komponen dari shadcn UI serta React Bits.
+**Research News for the Latest Agentic AI** — platform web statis berbasis Markdown untuk kurasi dan pembacaan riset kecerdasan buatan otonom (*Agentic AI*), dibangun dengan React, Vite, Tailwind CSS, komponen UI bergaya shadcn, dan React Bits oleh **D.Rendra ~ 2026**.
 
-Dibangun berdasarkan spesifikasi dari **DESIGN.md** oleh **D.Rendra ~ 2026**.
+## Fitur Utama
 
----
+- **Hero & Latar Interaktif**
+  - **Kiri**: judul `<TechText />` interaktif (intro animasi, pointer kick, drag), sub-judul, dan kredit `D.Rendra ~ 2026`.
+  - **Kanan**: `<DitherVeil />` berbasis OGL WebGL dengan efek Floyd-Steinberg dither yang bereaksi terhadap kursor dan klik.
+  - **Background & Logo Loop**: latar `<Galaxy />` WebGL starfield serta `<LogoLoop />` horizontal yang menampilkan ekosistem dan teknologi Agentic AI.
+- **Feed Riset (`feeds/*.md`)**
+  - Seluruh artikel dimuat otomatis dari `feeds/*.md` dan diurutkan berdasarkan `date` terbaru.
+  - Tata letak **Lead Dispatch** pada artikel utama diikuti grid *Cutout Card*, dilengkapi filter kategori, pencarian real-time (judul, ringkasan, tag, penulis), waktu baca, dan penghitung pembaca (`readers` baseline + hitungan lokal browser).
+- **Article Reader**
+  - Kolom baca terpusat (`66ch`) dengan mode **Paper** dan **Dark**, progress bar baca, serta ringkasan pembuka.
+  - Daftar lompat bagian (**In This Dispatch**), blok kode/diagram dengan tombol salin, tabel responsif, navigasi **Previous / Next Dispatch**, deep-link `?feed=<slug>`, salin URL, dan unduh file `.md` asli.
+- **Tipografi & Aksesibilitas**
+  - Menggunakan **Manrope** (display), **Plus Jakarta Sans** (body), dan **IBM Plex Mono** (kode/metadata).
+  - Memakai native `<dialog>`, fokus keyboard yang terlihat, target sentuh minimal 44px, dan menghormati `prefers-reduced-motion`.
 
-## ✨ Fitur & Arsitektur Desain
+## Menjalankan Secara Lokal
 
-1. **Hero Section (60% Kiri / 40% Kanan)**:
-   - **Bagian Kiri (60%)**:
-     - **Judul**: `"Delta Feed"` menggunakan komponen interaktif `<TechText />` (React Bits) dengan animasi intro, efek outline pointer, dan drag.
-     - **Sub-Judul**: `"Research news for the latest Agentic AI"` dengan tipografi modern bernuansa gradien kosmik.
-     - **Author Text**: `D.Rendra ~ 2026` (*italic*).
-     - **Animasi Masuk**: Transisi halus berjenjang (*staggered fade-in*).
-   - **Bagian Kanan (40%)**:
-     - Komponen interaktif `<DitherVeil />` bertenaga OGL WebGL shader dengan efek dither Floyd-Steinberg, responsif terhadap kursor dan klik burst.
-   - **Background Antariksa Interaktif**:
-     - Komponen `<Galaxy />` WebGL starfield dengan interaktivitas warp klik dan pergerakan bintang real-time.
-2. **Logo Loop Section**:
-   - Komponen `<LogoLoop />` horizontal tak terbatas menampilkan ekosistem dan lab frontier AI (Anthropic, Google DeepMind, Meta AI, Hugging Face, Mistral, NVIDIA NIM, OpenRouter, dll.).
-3. **Feed Section**:
-   - Menampilkan artikel riset dalam **grid 2 baris card**.
-   - Dilengkapi filter kategori dinamis, pencarian real-time, estimasi waktu baca, dan tags.
-   - Klik card untuk membuka **Modal Reader interaktif** dengan format markdown lengkap (tabel, code block, quote, metadata, tombol copy link & download `.md`).
-4. **Markdown Driven**:
-   - Seluruh artikel tersimpan di folder `feeds/*.md`. Cukup letakkan file `.md` baru ke dalam folder `feeds/` untuk otomatis dimuat ke feed.
-5. **Tipografi Pilihan**:
-   - Display & Heading: **Space Grotesk**
-   - Body & Text: **Plus Jakarta Sans**
-   - Code & Meta: **JetBrains Mono**
-6. **Navigasi Melayang (Dynamic Island)**:
-   - Navigasi tampil sebagai pulau melayang di atas konten dengan latar kaca gelap, garis tepi tipis, dan bayangan elevasi.
-   - Aksi **Research Feed** tetap menggulir ke bagian feed, dengan fokus keyboard yang terlihat dan preferensi reduced motion dihormati.
-7. **Footer**:
-   - Branding dan informasi kurator Delta Feed.
-
----
-
-## 📝 Cara Menambahkan Feed Baru
-
-Untuk mempublikasikan riset baru, buat file markdown baru di dalam folder `feeds/` (contoh: `feeds/07-my-new-paper.md`):
-
-```markdown
----
-id: "my-new-paper"
-title: "Autonomous Agent Tooling: Best Practices 2026"
-date: "2026-11-07"
-author: "D.Rendra"
-category: "Architectures"
-tags: ["Agents", "Tooling", "Reasoning"]
-readingTime: "5 min read"
-summary: "Ringkasan singkat tentang riset atau eksperimen agentic AI yang dilakukan."
-image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop"
-badge: "New"
----
-
-# Isi Riset Anda di Sini
-
-Tulis isi makalah atau dispatches Anda menggunakan format Markdown standar:
-- Header (#, ##, ###)
-- Code blocks (```python, ```typescript)
-- Tabel perbandingan
-- Blockquote
-```
-
-Aplikasi akan otomatis mendeteksi file tersebut saat build/reload.
-
----
-
-## 🚀 Panduan Deploy ke Layanan Gratis
-
-Karena aplikasi ini dikompilasi menjadi aset statis murni (`dist/`), Anda dapat mendeploy-nya ke berbagai penyedia hosting gratis tanpa biaya server:
-
-### 1. Cloudflare Pages (Rekomendasi Utama — 100% Gratis & Bandwidth Unlimited)
-1. Push repositori ini ke GitHub.
-2. Buka dashboard [Cloudflare Pages](https://dash.cloudflare.com/) > **Workers & Pages** > **Create application** > **Pages** > **Connect to Git**.
-3. Pilih repositori `delta`.
-4. Isi build configuration:
-   - **Framework preset**: `Vite`
-   - **Build command**: `bun run build`
-   - **Build output directory**: `dist`
-5. Klik **Save and Deploy**. Website Anda langsung live dengan custom domain & SSL gratis!
-
----
-
-### 2. Vercel (Gratis & Sangat Cepat)
-1. Buka [Vercel](https://vercel.com) dan login dengan akun GitHub.
-2. Klik **Add New Project** > Import repositori `delta`.
-3. Vercel otomatis mendeteksi Vite (`dist` sebagai output).
-4. Klik **Deploy**.
-
----
-
-### 3. GitHub Pages (Gratis & Terintegrasi Otomatis)
-Workflow GitHub Actions telah disediakan di `.github/workflows/deploy.yml`:
-1. Push project ke GitHub di branch `main`.
-2. Di GitHub repository Anda, buka tab **Settings** > **Pages**.
-3. Pada bagian **Build and deployment** > **Source**, pilih **GitHub Actions**.
-4. Begitu Anda melakukan `git push`, GitHub Actions akan otomatis melakukan build dan mendeploy ke `https://<username>.github.io/<repo>/`.
-
----
-
-### 4. Netlify
-1. Buka [Netlify](https://app.netlify.com).
-2. Drag & drop folder `dist` setelah menjalankan `bun run build`, atau hubungkan ke GitHub repositori dengan command `bun run build` dan publish directory `dist`.
-
----
-
-## 💻 Menjalankan di Komputer Lokal
-
-Instal [Bun](https://bun.sh/docs/installation) terlebih dahulu.
+Pastikan [Bun](https://bun.sh) sudah terpasang.
 
 ```bash
 # Install dependensi
 bun install --frozen-lockfile
 
-# Jalankan server development lokal
+# Jalankan server development
 bun run dev
 
-# Build untuk produksi
+# Jalankan tes unit dan komponen
+bun test
+
+# Build produksi ke dist/
 bun run build
 
 # Preview hasil build
 bun run preview
-
-# Jalankan tes unit dan komponen
-bun run test
 ```
 
-Untuk pemeriksaan interaksi di browser, jalankan `bun run dev`, lalu buka `http://localhost:5173/tests/browser.html`. Hasil setiap pemeriksaan ditampilkan sebagai PASS atau FAIL.
+Untuk memeriksa interaksi browser (dialog, fokus, clipboard, filter, dan viewport 320–1440px), jalankan `bun run dev` lalu buka `http://localhost:5173/tests/browser.html`.
+
+## Menambah Artikel Baru
+
+Buat file Markdown baru di folder `feeds/` (misalnya `feeds/19-topik-baru.md`) dengan frontmatter berikut:
+
+```markdown
+---
+id: "topik-baru"
+readers: 0
+title: "Judul Artikel Riset"
+date: "2026-11-26"
+author: "D.Rendra"
+category: "Architectures"
+tags: ["Agents", "Reasoning"]
+readingTime: "5 min read"
+summary: "Ringkasan singkat artikel yang tampil di kartu feed dan pembuka reader."
+image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop"
+badge: "New"
+---
+
+## 1. Bagian Pertama
+
+Tulis isi artikel dalam Markdown standar (heading `##`, `###`, daftar, blockquote, tabel GFM, dan code block).
+```
+
+> Catatan: Tidak perlu mengulang `# Judul` di baris pertama isi artikel karena judul sudah dirender dari field `title` di frontmatter (jika ada `# Judul` yang sama di baris awal, reader otomatis menghapus duplikatnya).
+
+## Struktur Proyek
+
+```text
+├── feeds/                  # Artikel riset dalam format Markdown (.md)
+├── src/
+│   ├── components/
+│   │   ├── FeedSection.jsx
+│   │   ├── FeedReaderModal.jsx
+│   │   ├── HeroSection.jsx
+│   │   ├── LogoLoopSection.jsx
+│   │   ├── Navbar.jsx
+│   │   ├── Footer.jsx
+│   │   ├── reactbits/      # Galaxy, TechText, DitherVeil, LogoLoop
+│   │   └── ui/             # Komponen UI (dialog, cutout-card, button, input, badge)
+│   ├── hooks/              # useMagneticScroll
+│   ├── lib/                # feedLoader.js (parser frontmatter & loader), utils.js
+│   ├── App.jsx
+│   └── index.css
+├── tests/                  # Tes Bun (feed, magnetic, dither) & browser.html
+├── DESIGN.md
+└── vercel.json
+```
+
+## Deploy
+
+Aplikasi dikompilasi menjadi aset statis di direktori `dist/` melalui `bun run build`:
+
+- **Cloudflare Pages / Netlify**: hubungkan repositori, atur build command ke `bun run build` dan output directory ke `dist`.
+- **Vercel**: konfigurasi Vite sudah tersedia di `vercel.json` (`dist` sebagai output).
+- **GitHub Pages**: deploy isi `dist/` setelah menjalankan `bun run build`.

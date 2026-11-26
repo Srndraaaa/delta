@@ -15,14 +15,19 @@ import {
 } from '@/components/ui/cutout-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Clock, ArrowUpRight, Filter, BookOpen, Users } from '@keyline-icons/react';
+import { formatReadCount } from '@/lib/feedLoader';
+import { Search, Clock, ArrowUpRight, Filter, BookOpen, Users, Check, X } from '@keyline-icons/react';
 
-function FeedCardItem({ feed, onSelectFeed }) {
+function FeedCardItem({ feed, onSelectFeed, onTagClick, isLead = false }) {
   const stagger = useCutoutContentStaggerVariants();
+  const readCountLabel = formatReadCount(feed);
+  const articleHref = `?feed=${encodeURIComponent(feed.slug)}`;
 
   return (
     <CutoutCard
-      className={cutoutCardSurfaceClassName}
+      className={`${cutoutCardSurfaceClassName} ${
+        isLead ? 'md:col-span-2 lg:col-span-3 md:flex md:flex-row' : 'flex flex-col'
+      }`}
       onClick={() => onSelectFeed(feed)}
     >
       <button
@@ -36,7 +41,9 @@ function FeedCardItem({ feed, onSelectFeed }) {
       />
 
       {/* Media section with image and cutout corners */}
-      <CutoutCardMedia className="h-60 sm:h-64">
+      <CutoutCardMedia
+        className={isLead ? 'h-64 md:h-auto md:w-[46%] md:min-h-[300px] shrink-0' : 'h-56 sm:h-60'}
+      >
         <CutoutCardImage
           alt={feed.title}
           src={feed.image}
@@ -60,7 +67,11 @@ function FeedCardItem({ feed, onSelectFeed }) {
       </CutoutCardMedia>
 
       {/* Card Content with motion stagger animation (Light theme) */}
-      <CutoutCardContent className="flex-1 flex flex-col justify-between p-6 pb-16 bg-white">
+      <CutoutCardContent
+        className={`flex-1 flex flex-col justify-between bg-white ${
+          isLead ? 'p-6 sm:p-8 pb-16' : 'p-6 pb-16'
+        }`}
+      >
         <motion.div
           animate="show"
           className="contents"
@@ -69,14 +80,18 @@ function FeedCardItem({ feed, onSelectFeed }) {
         >
           <div>
             <motion.h2
-              className="text-slate-900 mb-2 text-xl font-display leading-snug font-semibold group-hover/cutout:text-cyan-600 transition-colors line-clamp-2"
+              className={`text-slate-900 mb-2.5 font-display leading-snug font-semibold group-hover/cutout:text-cyan-700 transition-colors ${
+                isLead ? 'text-2xl sm:text-[1.65rem] line-clamp-2' : 'text-xl line-clamp-2'
+              }`}
               variants={stagger.item}
             >
               {feed.title}
             </motion.h2>
 
             <motion.p
-              className="text-slate-600 mb-4 text-xs font-sans leading-relaxed line-clamp-3"
+              className={`text-slate-600 mb-4 font-sans leading-relaxed ${
+                isLead ? 'text-sm sm:text-[15px] line-clamp-4' : 'text-[13px] line-clamp-3'
+              }`}
               variants={stagger.item}
             >
               {feed.summary}
@@ -84,30 +99,39 @@ function FeedCardItem({ feed, onSelectFeed }) {
           </div>
 
           <motion.div variants={stagger.item} className="space-y-4">
-            {/* Tags in light mode */}
-            <div className="flex flex-wrap gap-1.5">
-              {feed.tags.slice(0, 3).map((tag, tIdx) => (
-                <span
+            {/* Clickable tags */}
+            <div className="relative z-20 flex flex-wrap gap-1.5">
+              {feed.tags.slice(0, isLead ? 4 : 3).map((tag, tIdx) => (
+                <button
                   key={tIdx}
-                  className="text-[10px] font-sans px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200/80 font-medium"
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onTagClick(tag);
+                  }}
+                  className="text-[11px] font-sans px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 border border-slate-200/80 font-medium hover:bg-cyan-50 hover:text-cyan-800 hover:border-cyan-200 transition-colors cursor-pointer"
                 >
                   #{tag}
-                </span>
+                </button>
               ))}
             </div>
 
             {/* Reading Time Footer */}
-            <CutoutCardFooter className="border-slate-100 border-t pt-4 justify-end flex-wrap gap-x-4 gap-y-2">
+            <CutoutCardFooter className="border-slate-100 border-t pt-4 justify-start flex-wrap gap-x-4 gap-y-2 pr-32">
               <span className="text-slate-600 text-xs font-sans tabular-nums flex items-center gap-1 font-medium">
                 <Clock aria-hidden="true" className="w-3 h-3 text-cyan-600" />
                 {feed.readingTime}
               </span>
-              {(feed.readerCount != null || feed.localReadCount > 0) && (
+              {readCountLabel && (
                 <span className="text-slate-600 text-xs font-sans tabular-nums flex items-center gap-1 font-medium">
                   <Users aria-hidden="true" className="w-3 h-3 text-cyan-600" />
-                  {feed.readerCount != null
-                    ? `${feed.readerCount} ${feed.readerCount === 1 ? 'read' : 'reads'} (baseline + this browser)`
-                    : `${feed.localReadCount} ${feed.localReadCount === 1 ? 'read' : 'reads'} on this browser`}
+                  {readCountLabel}
+                </span>
+              )}
+              {feed.localReadCount > 0 && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700 border border-emerald-200/80">
+                  <Check aria-hidden="true" className="w-3 h-3" />
+                  Opened
                 </span>
               )}
             </CutoutCardFooter>
@@ -115,36 +139,51 @@ function FeedCardItem({ feed, onSelectFeed }) {
         </motion.div>
       </CutoutCardContent>
 
-      {/* Action button revealed on hover */}
-      <CutoutCardAction className="right-5 bottom-4 z-20">
-        <button
+      {/* Link-backed CTA allows normal modal open or Ctrl/Middle-click in a new tab */}
+      <CutoutCardAction revealOnHover={false} className="right-5 bottom-4 z-20">
+        <a
+          href={articleHref}
+          tabIndex={-1}
           onClick={(e) => {
-            e.stopPropagation();
-            onSelectFeed(feed);
+            if (!e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) {
+              e.preventDefault();
+              e.stopPropagation();
+              onSelectFeed(feed);
+            }
           }}
-          className="bg-slate-900 hover:bg-slate-800 text-white rounded-full px-4 py-1.5 text-xs font-sans font-semibold shadow-md transition-transform duration-150 active:scale-95 flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-slate-900 cursor-pointer"
-          type="button"
-          aria-label={`Read ${feed.title}`}
+          className="bg-slate-100 text-slate-800 group-hover/cutout:bg-slate-900 group-hover/cutout:text-white rounded-full px-3.5 py-1.5 text-xs font-sans font-semibold border border-slate-200/80 group-hover/cutout:border-slate-900 shadow-xs transition-colors duration-200 flex items-center gap-1.5 cursor-pointer"
         >
           <span>Read Paper</span>
           <ArrowUpRight className="w-3.5 h-3.5" />
-        </button>
+        </a>
       </CutoutCardAction>
     </CutoutCard>
   );
 }
 
-export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
-  const [searchQuery, setSearchQuery] = useState('');
+export function FeedSection({
+  feeds,
+  onSelectFeed,
+  feedSectionRef,
+  searchQuery: searchQueryProp,
+  onSearchQueryChange,
+}) {
+  const [internalSearchQuery, setInternalSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
-  // Extract unique categories
+  const searchQuery = searchQueryProp ?? internalSearchQuery;
+  const setSearchQuery = onSearchQueryChange ?? setInternalSearchQuery;
+
+  // Sort categories by frequency so popular topics appear first while 'All' leads
   const categories = useMemo(() => {
-    const set = new Set(['All']);
+    const counts = new Map();
     feeds.forEach((feed) => {
-      if (feed.category) set.add(feed.category);
+      if (feed.category) {
+        counts.set(feed.category, (counts.get(feed.category) || 0) + 1);
+      }
     });
-    return Array.from(set);
+    const sorted = Array.from(counts.keys()).sort((a, b) => counts.get(b) - counts.get(a));
+    return ['All', ...sorted];
   }, [feeds]);
 
   // Filter feeds based on search query and category
@@ -163,6 +202,11 @@ export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
     });
   }, [feeds, searchQuery, selectedCategory]);
 
+  const handleTagClick = (tag) => {
+    setSelectedCategory('All');
+    setSearchQuery(tag);
+  };
+
   return (
     <section
       ref={feedSectionRef}
@@ -171,7 +215,7 @@ export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
     >
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-slate-200/80 pb-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 border-b border-slate-200/80 pb-8">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="h-2 w-2 rounded-full bg-cyan-600"></span>
@@ -183,11 +227,7 @@ export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
               Agentic AI Research Feeds
             </h2>
             <p className="text-slate-600 text-sm mt-2 font-sans max-w-2xl">
-              Directly parsed from markdown dispatches located in the{' '}
-              <code className="text-cyan-800 bg-cyan-50 px-1.5 py-0.5 rounded border border-cyan-200 font-medium">
-                feeds/
-              </code>{' '}
-              directory, presented in Cutout Card format.
+              Curated technical briefs and field syntheses on autonomous agents, protocols, reasoning, and evaluation.
             </p>
           </div>
 
@@ -200,14 +240,24 @@ export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
               placeholder="Search papers, tags, topics..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 text-xs bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus-visible:ring-slate-900 focus-visible:border-slate-900 shadow-xs"
+              className="pl-10 pr-10 text-xs bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus-visible:ring-slate-900 focus-visible:border-slate-900 shadow-xs"
             />
+            {searchQuery && (
+              <button
+                type="button"
+                aria-label="Clear search"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Category Pills Filter (Light Theme) */}
-        <div className="flex flex-wrap items-center gap-2 mb-10">
-          <span className="text-xs font-sans text-slate-500 flex items-center gap-1.5 mr-2 font-medium">
+        {/* Category Pills Filter (Horizontal scroll on mobile, wrap on desktop) */}
+        <div className="flex items-center gap-2 mb-10 overflow-x-auto pb-2 sm:pb-0 sm:flex-wrap">
+          <span className="text-xs font-sans text-slate-500 flex items-center gap-1.5 mr-1 font-medium shrink-0">
             <Filter className="w-3.5 h-3.5 text-cyan-600" />
             Filter:
           </span>
@@ -219,7 +269,7 @@ export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
                 type="button"
                 aria-pressed={isActive}
                 onClick={() => setSelectedCategory(category)}
-                className={`min-h-11 px-3.5 py-1.5 rounded-xl text-xs font-sans transition-all duration-200 border focus-visible:outline focus-visible:outline-2 focus-visible:outline-slate-900 ${
+                className={`min-h-11 shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-sans transition-all duration-200 border focus-visible:outline focus-visible:outline-2 focus-visible:outline-slate-900 ${
                   isActive
                     ? 'bg-slate-900 text-white border-slate-900 shadow-sm font-semibold'
                     : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 hover:text-slate-900 shadow-xs'
@@ -241,7 +291,7 @@ export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
             <p className="text-sm text-slate-500 mt-1">
               {feeds.length
                 ? 'Try resetting the search keyword or filter.'
-                : 'Add a Markdown file to feeds/ and rebuild the site.'}
+                : 'No published research briefs are available yet.'}
             </p>
             {feeds.length > 0 && (
               <Button
@@ -263,7 +313,9 @@ export function FeedSection({ feeds, onSelectFeed, feedSectionRef }) {
               <FeedCardItem
                 key={feed.slug || index}
                 feed={feed}
+                isLead={!searchQuery && selectedCategory === 'All' && filteredFeeds.length > 1 && index === 0}
                 onSelectFeed={onSelectFeed}
+                onTagClick={handleTagClick}
               />
             ))}
           </div>
